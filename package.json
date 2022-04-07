@@ -1,0 +1,21 @@
+{
+  "name": "feathered-social-link",
+  "version": "0.1.0",
+  "author": "JackDotJS",
+  "description": "Sends a message in specific channels whenever I post stuff.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JackDotJS/feathered-social-link"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^13.1.0",
+    "twitter-api-v2": "^1.11.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.27.0"
+  }
+}
