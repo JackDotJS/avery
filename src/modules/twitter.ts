@@ -1,7 +1,8 @@
 import { ETwitterStreamEvent, TweetStream, TwitterApi, ETwitterApiError } from 'twitter-api-v2';
-import cfg from './config/config.json' assert { type: "json" };
+import cfg from '../../config/config.json' assert { type: "json" };
+import keys from '../../config/keys.json' assert { type: "json" };
 
-const tClient = new TwitterApi(cfg.twitter.bearer_token);
+const tClient = new TwitterApi(keys.twitter);
 
 const tweetRules = await tClient.v2.updateStreamRules({
   add: [
