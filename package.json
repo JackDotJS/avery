@@ -9,8 +9,10 @@
     "url": "https://github.com/JackDotJS/feathered-social-link"
   },
   "scripts": {
-    "start": "ts-node index.ts"
+    "build": "tsc",
+    "start": "tsc && node build/index.js"
   },
+  "type": "module",
   "dependencies": {
     "discord.js": "^13.1.0",
     "twitter-api-v2": "^1.11.3"
@@ -20,7 +22,6 @@
     "@typescript-eslint/eslint-plugin": "^5.18.0",
     "@typescript-eslint/parser": "^5.18.0",
     "eslint": "^7.27.0",
-    "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
   }
 }
