@@ -1,6 +1,19 @@
 {
+  "resets": {
+    "warningThreshold": 8,
+    "shutdownThreshold": 32
+  },
   "twitter": {
-    "params": "",
-    "bearer_token": ""
+    "output": {
+      "guild": "",
+      "channel": ""
+    },
+    "params": ""
+  },
+  "youtube": {
+    "output": {
+      "guild": "",
+      "channel": ""
+    }
   }
 }
