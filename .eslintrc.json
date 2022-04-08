@@ -1,7 +1,4 @@
 {
-  "parserOptions": {
-    "ecmaVersion": 2020
-  },
   "overrides": [
     {
       "files": [ "*.mjs" ],
@@ -15,7 +12,7 @@
     "@typescript-eslint"
   ],
   "env": {
-    "es6": true,
+    "es2022": true,
     "node": true
   },
   "extends": [
