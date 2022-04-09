@@ -15,5 +15,5 @@
       "es2020"
     ]
   },
-  "include": ["./index.ts", "./modules/**/*"],
+  "include": ["./src/**/*"],
 }
