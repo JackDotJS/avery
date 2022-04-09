@@ -117,7 +117,7 @@ export class Logger {
       console.log(terminal1 + terminal2)
     }
 
-    if (this.stream) {
+    if (this.stream && this.stream.writable) {
       this.stream.write(plain1 + plain2);
     }
   
