@@ -1,5 +1,9 @@
 node_modules
 build/*
 !build/.gitkeep
+log/all/*
+!log/all/.gitkeep
+log/crash/*
+!log/crash/.gitkeep
 config/config.json
 config/keys.json
