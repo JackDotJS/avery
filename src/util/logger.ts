@@ -7,7 +7,7 @@ import { WriteStream } from 'fs';
 export class Logger {
   stream: WriteStream | null;
 
-  constructor(stream: WriteStream | void) {
+  constructor(stream?: WriteStream) {
     if (stream != null) {
       this.stream = stream;
     } else {
@@ -15,7 +15,7 @@ export class Logger {
     }
   }
 
-  getSource = (trace: string | void) => {
+  getSource = (trace?: string) => {
     if (typeof trace === `string`) {
       const match = trace.split(`\n`)[2].match(/(?<=at\s|\()([^(]*):(\d+):(\d+)\)?$/);
   
@@ -31,7 +31,7 @@ export class Logger {
     return `unknown`;
   }
 
-  format = (content: any, level: string, source: string | void) => {
+  format = (content: any, level: string, source?: string) => {
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2, `0`);
     const mm = now.getUTCMinutes().toString().padStart(2, `0`);
