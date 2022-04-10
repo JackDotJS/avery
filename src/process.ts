@@ -1,4 +1,7 @@
 import { Logger } from './util/logger.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { readdirSync } from 'fs';
 import keys from '../config/keys.json' assert { type: "json" };
 import { Client, Intents, ClientOptions } from 'discord.js';
 
@@ -11,6 +14,7 @@ const djsOpts: ClientOptions = {
   allowedMentions: { parse: [`users`, `roles`] }, // remove this line to die instantly
   intents: [
     // https://discord.com/developers/docs/topics/gateway#list-of-intents
+    Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES
   ],
   partials: [
@@ -18,12 +22,24 @@ const djsOpts: ClientOptions = {
   ]
 };
 
-const bot = new Client(djsOpts);
+export const bot = new Client(djsOpts);
+
+for (const file of readdirSync(`${dirname(fileURLToPath(import.meta.url))}/modules/`)) {
+  import(`./modules/${file}`).then(() => {
+    log.info(`Loaded module from ${file}`);
+  });
+}
 
 bot.on(`ready`, (client) => {
+  let av = 0;
+
+  client.guilds.cache.each((guild) => {
+    if (guild.available) av++;
+  });
+
   log.info([
     `=== Discord API Connection Established! ===`,
-    `Successfully connected with ${client.guilds.cache.size} guild(s)`
+    `Successfully connected with ${client.guilds.cache.size} guild(s) (${av} available)`
   ].join(`\n`));
 });
 
