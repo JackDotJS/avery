@@ -15,7 +15,7 @@ export class Logger {
     }
   }
 
-  getSource = (trace: String | void) => {
+  getSource = (trace: string | void) => {
     if (typeof trace === `string`) {
       const match = trace.split(`\n`)[2].match(/(?<=at\s|\()([^(]*):(\d+):(\d+)\)?$/);
   
@@ -31,7 +31,7 @@ export class Logger {
     return `unknown`;
   }
 
-  format = (content: any, level: String, source: String | void) => {
+  format = (content: any, level: string, source: string | void) => {
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2, `0`);
     const mm = now.getUTCMinutes().toString().padStart(2, `0`);
