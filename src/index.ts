@@ -37,6 +37,7 @@ let resets: number = 0;
 let resetTime: number = Date.now();
 
 const exit = (code: number) => {
+  // https://nodejs.org/api/process.html#process_exit_codes
   output.log.warn(`Child process closed with exit code ${code}`)
 
   let exit = true;
@@ -100,7 +101,7 @@ const exit = (code: number) => {
     }
 
     start();
-  }, 5000);
+  }, 10000);
 }
 
 const start = () => {
