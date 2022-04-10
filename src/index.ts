@@ -9,7 +9,7 @@ import cfg from '../config/config.json' assert { type: "json" };
 
 type output = {
   log: Logger
-  filename: String,
+  filename: string,
   stream: WriteStream
 }
 
