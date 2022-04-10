@@ -91,7 +91,7 @@ const exit = (code: number) => {
   output.stream.close();
 
   if (report) {
-    copyFileSync(output.stream.path, `./logs/crash/${basename(output.stream.path.toString())}`);
+    copyFileSync(output.stream.path, `./log/crash/${basename(output.stream.path.toString())}`);
   } 
 
   setTimeout(() => {
