@@ -4,6 +4,7 @@ import { dirname } from 'path';
 import { readdirSync } from 'fs';
 import keys from '../config/keys.json' assert { type: "json" };
 import { Client, Intents, ClientOptions } from 'discord.js';
+import memory from './memory.js';
 
 const log = new Logger();
 
@@ -23,12 +24,7 @@ const djsOpts: ClientOptions = {
 };
 
 export const bot = new Client(djsOpts);
-
-for (const file of readdirSync(`${dirname(fileURLToPath(import.meta.url))}/modules/`)) {
-  import(`./modules/${file}`).then(() => {
-    log.info(`Loaded module from ${file}`);
-  });
-}
+memory.bot = bot;
 
 bot.on(`ready`, (client) => {
   let av = 0;
@@ -41,7 +37,15 @@ bot.on(`ready`, (client) => {
     `=== Discord API Connection Established! ===`,
     `Successfully connected with ${client.guilds.cache.size} guild(s) (${av} available)`
   ].join(`\n`));
+
+  for (const file of readdirSync(`${dirname(fileURLToPath(import.meta.url))}/modules/`)) {
+    import(`./modules/${file}`).then(() => {
+      log.info(`Loaded module from ${file}`);
+    });
+  }
 });
+
+// guild status
 
 bot.on(`guildUnavailable`, (guild) => {
   log.warn([
@@ -53,11 +57,64 @@ bot.on(`guildUnavailable`, (guild) => {
 bot.on(`guildUpdate`, (oldGuild, newGuild) => {
   if (oldGuild.available && newGuild.available) return;
 
-  log.warn([
+  log.info([
     `=== Guild Now Available! ===`,
     `"${newGuild.name}" (${newGuild.id}) has recovered.`,
   ].join(`\n`));
 });
+
+// websocket status events
+
+bot.on(`shardDisconnect`, (event) => {
+  log.warn([
+    `=== Discord API Disconnect! ===`,
+    `Disconnect Reason: ${event.reason}`,
+    `Event Code: ${event.code}`,
+    `wasClean: ${event.wasClean}`
+  ].join(`\n`));
+});
+
+bot.on(`shardReconnecting`, () => {
+  log.debug(`Attempting to reconnect to Discord API...`);
+});
+
+bot.on(`shardResume`, (id, replayedEvents) => {
+  log.warn([
+    `=== Discord API Reconnected! ===`,
+    `Events replayed: ${replayedEvents}`,
+  ].join(`\n`));
+});
+
+bot.on(`shardError`, (event) => {
+  log.error([
+    `=== Discord API WS Error! ===`,
+    event.stack || event.toString()
+  ].join(`\n`));
+});
+
+// ratelimit/api spam warnings
+
+bot.on(`invalidRequestWarning`, (data) => {
+  log.warn([
+    `=== Multiple Invalid Requests! ===`,
+    `Invalid requests made: ${data.count}`,
+    `Time before reset: ${data.remainingTime / 1000} seconds`
+  ].join(`\n`));
+});
+
+bot.on(`rateLimit`, (data) => {
+  log.warn([
+    `=== Discord API Ratelimited! ===`,
+    `Timeout: ${data.timeout}`,
+    `Limit: ${data.limit}`,
+    `Method: ${data.method}`,
+    `Path: ${data.path}`,
+    `Route: ${data.route}`,
+    `Global?: ${data.global}`
+  ].join(`\n`));
+});
+
+// djs log events
 
 bot.on(`debug`, (message) => {
   log.debug(message);
