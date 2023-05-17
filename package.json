@@ -15,6 +15,7 @@
   "dependencies": {
     "@types/node": "^20.1.7",
     "bufferutil": "^4.0.7",
+    "chalk": "^5.2.0",
     "discord.js": "^14.11.0",
     "revolt.js": "7.0.0-beta.4",
     "utf-8-validate": "^6.0.3"

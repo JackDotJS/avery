@@ -7,6 +7,9 @@ dependencies:
   bufferutil:
     specifier: ^4.0.7
     version: 4.0.7
+  chalk:
+    specifier: ^5.2.0
+    version: 5.2.0
   discord.js:
     specifier: ^14.11.0
     version: 14.11.0(bufferutil@4.0.7)(utf-8-validate@6.0.3)
@@ -509,6 +512,11 @@ packages:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
     dev: true
+
+  /chalk@5.2.0:
+    resolution: {integrity: sha512-ree3Gqw/nazQAPuJJEy+avdl7QfZMcUvmHIKgEZkGL+xOBzRvup5Hxo6LHuMceSxOabuJLJm5Yp/92R9eMmMvA==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+    dev: false
 
   /color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
