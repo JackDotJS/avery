@@ -20,16 +20,16 @@ export class Logger {
       const match = trace.split(`\n`)[2].match(/(?<=at\s|\()([^(]*):(\d+):(\d+)\)?$/);
   
       if (match != null && match.length >= 4) {
-        const file_name = normalize(fileURLToPath(match[1])).replace(process.cwd(), `~`);
+        const fileName = normalize(fileURLToPath(match[1])).replace(process.cwd(), `~`);
         const line = match[2];
         const column = match[3];
   
-        return `${file_name}:${line}:${column}`;
+        return `${fileName}:${line}:${column}`;
       }
     }
   
     return `unknown`;
-  }
+  };
 
   format = (content: any, level: string, source?: string) => {
     const now = new Date();
@@ -114,7 +114,7 @@ export class Logger {
         }
       });
     } else {
-      console.log(terminal1 + terminal2)
+      console.log(terminal1 + terminal2);
     }
 
     if (this.stream && this.stream.writable) {
@@ -122,25 +122,25 @@ export class Logger {
     }
   
     return plain1 + plain2;
-  }
+  };
 
   debug = (...content: any[]) => {
     this.format(content.join(` `), `debug`, this.getSource(new Error().stack));
-  }
+  };
 
   info = (...content: any[]) => {
     this.format(content.join(` `), `info`, this.getSource(new Error().stack));
-  }
+  };
 
   warn = (...content: any[]) => {
     this.format(content.join(` `), `warn`, this.getSource(new Error().stack));
-  }
+  };
 
   error = (...content: any[]) => {
     this.format(content.join(` `), `error`, this.getSource(new Error().stack));
-  }
+  };
 
   fatal = (...content: any[]) => {
     this.format(content.join(` `), `fatal`, this.getSource(new Error().stack));
-  }
+  };
 }
