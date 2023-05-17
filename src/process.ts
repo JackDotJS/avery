@@ -2,8 +2,8 @@ import { Logger } from './util/logger.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { readdirSync } from 'fs';
-import keys from '../config/keys.json' assert { type: "json" };
-import { Client, Intents, ClientOptions } from 'discord.js';
+// eslint-disable-next-line @typescript-eslint/quotes
+import keys from '../config/keys.json' assert { type: 'json' };
 import memory from './memory.js';
 
 const log = new Logger();

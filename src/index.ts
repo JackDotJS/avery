@@ -5,13 +5,15 @@ import { inspect } from 'util';
 import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
 import { Logger } from './util/logger.js';
-import cfg from '../config/config.json' assert { type: "json" };
+// typescript eslint doesn't understand yet that import assertions require normal quotes
+// eslint-disable-next-line @typescript-eslint/quotes
+import cfg from '../config/config.json' assert { type: 'json' };
 
 type output = {
   log: Logger
   filename: string,
   stream: WriteStream
-}
+};
 
 const output = {} as output;
 
@@ -23,7 +25,7 @@ const cli = createInterface({
 
 console.clear();
 
-await new Promise((resolve: Function, reject: Function) => {
+await new Promise<void>((resolve, reject) => {
   cli.question(`START [Y/N]`, (res) => {
     if (res.trim().toLowerCase() === `y`) return resolve();
     if (res.trim().toLowerCase() === `n`) return process.exit();
@@ -33,12 +35,12 @@ await new Promise((resolve: Function, reject: Function) => {
 
 cli.close();
 
-let resets: number = 0;
-let resetTime: number = Date.now();
+let resets = 0;
+const resetTime: number = Date.now();
 
 const exit = (code: number) => {
   // https://nodejs.org/api/process.html#process_exit_codes
-  output.log.warn(`Child process closed with exit code ${code}`)
+  output.log.warn(`Child process closed with exit code ${code}`);
 
   let exit = true;
   let report = true;
@@ -79,11 +81,11 @@ const exit = (code: number) => {
     }
 
     if (resets >= cfg.resets.warningThreshold) {
-      output.log.warn(`Unusually high client reset count: ${resets}`)
+      output.log.warn(`Unusually high client reset count: ${resets}`);
     }
 
     if (resets >= cfg.resets.shutdownThreshold) {
-      output.log.fatal(`Boot loop possibly detected, shutting down for safety.`)
+      output.log.fatal(`Boot loop possibly detected, shutting down for safety.`);
       exit = true;
       report = true;
     }
@@ -102,9 +104,9 @@ const exit = (code: number) => {
 
     start();
   }, 10000);
-}
+};
 
-const start = () => {
+function start() {
   console.clear();
 
   output.filename = new Date().toUTCString().replace(/[/\\?%*:|"<>]/g, `.`);
