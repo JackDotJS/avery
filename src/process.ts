@@ -4,6 +4,7 @@ import { dirname } from 'path';
 import { readdirSync } from 'fs';
 // eslint-disable-next-line @typescript-eslint/quotes
 import keys from '../config/keys.json' assert { type: 'json' };
+import { Client, GatewayIntentBits as Intents, ClientOptions, Partials } from 'discord.js';
 import memory from './memory.js';
 
 const log = new Logger();
@@ -15,11 +16,11 @@ const djsOpts: ClientOptions = {
   allowedMentions: { parse: [`users`, `roles`] }, // remove this line to die instantly
   intents: [
     // https://discord.com/developers/docs/topics/gateway#list-of-intents
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES
+    Intents.Guilds,
+    Intents.GuildMessages
   ],
   partials: [
-    `CHANNEL`
+    Partials.Channel
   ]
 };
 
