@@ -13,6 +13,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@types/node": "^20.1.7",
     "bufferutil": "^4.0.7",
     "discord.js": "^14.11.0",
     "revolt.js": "7.0.0-beta.4",
