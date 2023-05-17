@@ -43,12 +43,12 @@ export class Logger {
       content: `${hh}:${mm}:${ss}.${ms}`
     };
   
-    const file_path = {
+    const filePath = {
       color: chalk.yellow,
       content: source || this.getSource(new Error().stack)
     };
   
-    const log_level = {
+    const logLevel = {
       color: chalk.magenta,
       content: `DEBUG`
     };
@@ -60,24 +60,24 @@ export class Logger {
   
     if (typeof level === `string`) {
       if ([`fatal`, `error`, `warn`, `info`].includes(level.toLowerCase())) {
-        log_level.content = level.toUpperCase();
+        logLevel.content = level.toUpperCase();
       }
   
       switch (level.toLowerCase()) {
         case `fatal`:
-          log_level.color = chalk.inverse.bgRedBright;
+          logLevel.color = chalk.inverse.bgRedBright;
           message.color = chalk.redBright;
           break;
         case `error`:
-          log_level.color = chalk.red;
+          logLevel.color = chalk.red;
           message.color = chalk.red;
           break;
         case `warn`:
-          log_level.color = chalk.yellowBright;
+          logLevel.color = chalk.yellowBright;
           message.color = chalk.yellowBright;
           break;
         case `info`:
-          log_level.color = chalk.white;
+          logLevel.color = chalk.white;
           message.color = chalk.whiteBright;
           break;
       }
@@ -94,13 +94,13 @@ export class Logger {
       }
     }
   
-    const plain1 = `[${timestamp.content}] [${file_path.content}] [${log_level.content}] : `;
+    const plain1 = `[${timestamp.content}] [${filePath.content}] [${logLevel.content}] : `;
     const plain2 = message.content.replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim() + `\n`;
   
     const terminal1 = [
       timestamp.color(`[${timestamp.content}]`),
-      file_path.color(`[${file_path.content}]`),
-      log_level.color(`[${log_level.content}]`),
+      filePath.color(`[${filePath.content}]`),
+      logLevel.color(`[${logLevel.content}]`),
       `: `
     ].join(` `);
     const terminal2 = message.color(message.content.replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim());
