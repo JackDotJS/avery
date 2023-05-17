@@ -31,7 +31,7 @@ export class Logger {
     return `unknown`;
   };
 
-  format = (content: any, level: string, source?: string) => {
+  format = (content: unknown, level: string, source?: string) => {
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2, `0`);
     const mm = now.getUTCMinutes().toString().padStart(2, `0`);
@@ -95,7 +95,7 @@ export class Logger {
     }
   
     const plain1 = `[${timestamp.content}] [${filePath.content}] [${logLevel.content}] : `;
-    const plain2 = message.content.replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim() + `\n`;
+    const plain2 = (message.content as string).replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim() + `\n`;
   
     const terminal1 = [
       timestamp.color(`[${timestamp.content}]`),
@@ -103,7 +103,7 @@ export class Logger {
       logLevel.color(`[${logLevel.content}]`),
       `: `
     ].join(` `);
-    const terminal2 = message.color(message.content.replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim());
+    const terminal2 = message.color((message.content as string).replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim());
     
     if (process.send) {
       process.send({
@@ -124,23 +124,23 @@ export class Logger {
     return plain1 + plain2;
   };
 
-  debug = (...content: any[]) => {
+  debug = (...content: unknown[]) => {
     this.format(content.join(` `), `debug`, this.getSource(new Error().stack));
   };
 
-  info = (...content: any[]) => {
+  info = (...content: unknown[]) => {
     this.format(content.join(` `), `info`, this.getSource(new Error().stack));
   };
 
-  warn = (...content: any[]) => {
+  warn = (...content: unknown[]) => {
     this.format(content.join(` `), `warn`, this.getSource(new Error().stack));
   };
 
-  error = (...content: any[]) => {
+  error = (...content: unknown[]) => {
     this.format(content.join(` `), `error`, this.getSource(new Error().stack));
   };
 
-  fatal = (...content: any[]) => {
+  fatal = (...content: unknown[]) => {
     this.format(content.join(` `), `fatal`, this.getSource(new Error().stack));
   };
 }
