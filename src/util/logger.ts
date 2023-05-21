@@ -20,18 +20,18 @@ export class Logger {
       const match = trace.split(`\n`)[2].match(/(?<=at\s|\()([^(]*):(\d+):(\d+)\)?$/);
   
       if (match != null && match.length >= 4) {
-        const file_name = normalize(fileURLToPath(match[1])).replace(process.cwd(), `~`);
+        const fileName = normalize(fileURLToPath(match[1])).replace(process.cwd(), `~`);
         const line = match[2];
         const column = match[3];
   
-        return `${file_name}:${line}:${column}`;
+        return `${fileName}:${line}:${column}`;
       }
     }
   
     return `unknown`;
-  }
+  };
 
-  format = (content: any, level: string, source?: string) => {
+  format = (content: unknown, level: string, source?: string) => {
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2, `0`);
     const mm = now.getUTCMinutes().toString().padStart(2, `0`);
@@ -43,12 +43,12 @@ export class Logger {
       content: `${hh}:${mm}:${ss}.${ms}`
     };
   
-    const file_path = {
+    const filePath = {
       color: chalk.yellow,
       content: source || this.getSource(new Error().stack)
     };
   
-    const log_level = {
+    const logLevel = {
       color: chalk.magenta,
       content: `DEBUG`
     };
@@ -60,24 +60,24 @@ export class Logger {
   
     if (typeof level === `string`) {
       if ([`fatal`, `error`, `warn`, `info`].includes(level.toLowerCase())) {
-        log_level.content = level.toUpperCase();
+        logLevel.content = level.toUpperCase();
       }
   
       switch (level.toLowerCase()) {
         case `fatal`:
-          log_level.color = chalk.inverse.bgRedBright;
+          logLevel.color = chalk.inverse.bgRedBright;
           message.color = chalk.redBright;
           break;
         case `error`:
-          log_level.color = chalk.red;
+          logLevel.color = chalk.red;
           message.color = chalk.red;
           break;
         case `warn`:
-          log_level.color = chalk.yellowBright;
+          logLevel.color = chalk.yellowBright;
           message.color = chalk.yellowBright;
           break;
         case `info`:
-          log_level.color = chalk.white;
+          logLevel.color = chalk.white;
           message.color = chalk.whiteBright;
           break;
       }
@@ -94,16 +94,16 @@ export class Logger {
       }
     }
   
-    const plain1 = `[${timestamp.content}] [${file_path.content}] [${log_level.content}] : `;
-    const plain2 = message.content.replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim() + `\n`;
+    const plain1 = `[${timestamp.content}] [${filePath.content}] [${logLevel.content}] : `;
+    const plain2 = (message.content as string).replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim() + `\n`;
   
     const terminal1 = [
       timestamp.color(`[${timestamp.content}]`),
-      file_path.color(`[${file_path.content}]`),
-      log_level.color(`[${log_level.content}]`),
+      filePath.color(`[${filePath.content}]`),
+      logLevel.color(`[${logLevel.content}]`),
       `: `
     ].join(` `);
-    const terminal2 = message.color(message.content.replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim());
+    const terminal2 = message.color((message.content as string).replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim());
     
     if (process.send) {
       process.send({
@@ -114,7 +114,7 @@ export class Logger {
         }
       });
     } else {
-      console.log(terminal1 + terminal2)
+      console.log(terminal1 + terminal2);
     }
 
     if (this.stream && this.stream.writable) {
@@ -122,25 +122,25 @@ export class Logger {
     }
   
     return plain1 + plain2;
-  }
+  };
 
-  debug = (...content: any[]) => {
+  debug = (...content: unknown[]) => {
     this.format(content.join(` `), `debug`, this.getSource(new Error().stack));
-  }
+  };
 
-  info = (...content: any[]) => {
+  info = (...content: unknown[]) => {
     this.format(content.join(` `), `info`, this.getSource(new Error().stack));
-  }
+  };
 
-  warn = (...content: any[]) => {
+  warn = (...content: unknown[]) => {
     this.format(content.join(` `), `warn`, this.getSource(new Error().stack));
-  }
+  };
 
-  error = (...content: any[]) => {
+  error = (...content: unknown[]) => {
     this.format(content.join(` `), `error`, this.getSource(new Error().stack));
-  }
+  };
 
-  fatal = (...content: any[]) => {
+  fatal = (...content: unknown[]) => {
     this.format(content.join(` `), `fatal`, this.getSource(new Error().stack));
-  }
+  };
 }

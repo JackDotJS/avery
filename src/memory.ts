@@ -6,6 +6,6 @@ interface MemoryInterface {
 
 const memory: MemoryInterface = {
   bot: null
-}
+};
 
 export default memory;
