@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node build/src/index.js"
+    "start": "node build/src/index.js"
   },
   "type": "module",
   "dependencies": {
