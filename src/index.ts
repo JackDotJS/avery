@@ -1,5 +1,4 @@
 import { spawn } from 'child_process';
-import { createInterface } from 'readline';
 import { createWriteStream, copyFileSync, WriteStream } from 'fs';
 import { inspect } from 'util';
 import { fileURLToPath } from 'url';
@@ -16,24 +15,6 @@ type output = {
 };
 
 const output = {} as output;
-
-// quick confirmation before actually starting
-const cli = createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-console.clear();
-
-await new Promise<void>((resolve, reject) => {
-  cli.question(`START [Y/N]`, (res) => {
-    if (res.trim().toLowerCase() === `y`) return resolve();
-    if (res.trim().toLowerCase() === `n`) return process.exit();
-    reject();
-  });
-});
-
-cli.close();
 
 let resets = 0;
 const resetTime: number = Date.now();
