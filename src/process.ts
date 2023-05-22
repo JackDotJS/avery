@@ -28,11 +28,7 @@ export const bot = new Client(djsOpts);
 memory.bot = bot;
 
 bot.on(`ready`, (client) => {
-  let av = 0;
-
-  client.guilds.cache.each((guild) => {
-    if (guild.available) av++;
-  });
+  const av = client.guilds.cache.filter(g => g.available).size;
 
   log.info([
     `=== Discord API Connection Established! ===`,
