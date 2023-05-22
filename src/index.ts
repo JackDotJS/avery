@@ -76,13 +76,13 @@ const exit = (code: number) => {
 
   if (report) {
     copyFileSync(output.stream.path, `./log/crash/${basename(output.stream.path.toString())}`);
-  } 
+  }
+  
+  if (exit) {
+    process.exit(code);
+  }
 
   setTimeout(() => {
-    if (exit) {
-      return process.exit(code);
-    }
-
     start();
   }, 10000);
 };
