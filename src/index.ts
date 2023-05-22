@@ -1,9 +1,10 @@
-import { spawn } from 'child_process';
+import { fork } from 'child_process';
 import { createWriteStream, copyFileSync, WriteStream } from 'fs';
 import { inspect } from 'util';
 import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
 import { Logger } from './util/logger.js';
+
 // typescript eslint doesn't understand yet that import assertions require normal quotes
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from '../config/config.json' assert { type: 'json' };
@@ -88,13 +89,14 @@ const exit = (code: number) => {
 };
 
 function start() {
-  console.clear();
-
   output.filename = new Date().toUTCString().replace(/[/\\?%*:|"<>]/g, `.`);
   output.stream = createWriteStream(`./log/all/${output.filename}.log`);
   output.log = new Logger(output.stream);
 
-  const sm = spawn(`node`, [`${dirname(fileURLToPath(import.meta.url))}/process.js`], {
+  const startPath = dirname(fileURLToPath(import.meta.url)) + `/process.js`;
+  output.log.debug(`Starting child process: ${startPath}`);
+
+  const sm = fork(startPath, {
     env: {
       FORCE_COLOR: `true`
     },
