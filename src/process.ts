@@ -62,12 +62,14 @@ bot.on(`guildUpdate`, (oldGuild, newGuild) => {
 
 // websocket status events
 
+// Removed these two properties because they're deprecated and don't provide
+// any real data anyway.
 bot.on(`shardDisconnect`, (event) => {
   log.warn([
     `=== Discord API Disconnect! ===`,
-    `Disconnect Reason: ${event.reason}`,
+    // `Disconnect Reason: ${event.reason}`,
     `Event Code: ${event.code}`,
-    `wasClean: ${event.wasClean}`
+    // `wasClean: ${event.wasClean}`
   ].join(`\n`));
 });
 
