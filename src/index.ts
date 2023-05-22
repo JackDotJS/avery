@@ -3,7 +3,7 @@ import { createWriteStream, copyFileSync, WriteStream } from 'fs';
 import { inspect } from 'util';
 import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
-import { Logger } from './util/logger.js';
+import { Logger, IPCLoggerObject } from './util/logger.js';
 
 // typescript eslint doesn't understand yet that import assertions require normal quotes
 // eslint-disable-next-line @typescript-eslint/quotes
@@ -116,14 +116,24 @@ function start() {
     });
   }
 
-  sm.on(`message`, (data: any) => {
-    switch (data.t) {
-      case `LOG`:
-        console.log(data.c.color);
-        output.stream.write(data.c.plain);
-        break;
-      default:
-        output.log.debug(inspect(data)); // to the debugeon with you
+  sm.on(`message`, (data: unknown) => {
+    if (data === null) {
+      output.log.warn(`Child process sent null message.`);
+      return;
+    }
+
+    if (typeof data === `object`) {
+      const dataObject = data as IPCLoggerObject;
+      switch (dataObject.t) {
+        case `LOG`:
+          console.log(dataObject.c.color);
+          output.stream.write(dataObject.c.plain);
+          break;
+        default:
+          output.log.debug(inspect(dataObject)); // to the debugeon with you
+      }
+    } else {
+      output.log.debug(inspect(data)); // to the debugeon with you
     }
   });
 

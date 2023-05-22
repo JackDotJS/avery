@@ -4,6 +4,14 @@ import { normalize } from 'path';
 import { inspect } from 'util';
 import { WriteStream } from 'fs';
 
+export interface IPCLoggerObject {
+  t: string,
+  c: {
+    plain: string,
+    color: string
+  }
+}
+
 export class Logger {
   stream: WriteStream | null;
 
