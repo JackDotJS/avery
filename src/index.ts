@@ -1,9 +1,10 @@
-import { spawn } from 'child_process';
+import { fork } from 'child_process';
 import { createWriteStream, copyFileSync, WriteStream } from 'fs';
 import { inspect } from 'util';
 import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
-import { Logger } from './util/logger.js';
+import { Logger, IPCLoggerObject } from './util/logger.js';
+
 // typescript eslint doesn't understand yet that import assertions require normal quotes
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from '../config/config.json' assert { type: 'json' };
@@ -76,25 +77,26 @@ const exit = (code: number) => {
 
   if (report) {
     copyFileSync(output.stream.path, `./log/crash/${basename(output.stream.path.toString())}`);
-  } 
+  }
+  
+  if (exit) {
+    process.exit(code);
+  }
 
   setTimeout(() => {
-    if (exit) {
-      return process.exit(code);
-    }
-
     start();
   }, 10000);
 };
 
 function start() {
-  console.clear();
-
   output.filename = new Date().toUTCString().replace(/[/\\?%*:|"<>]/g, `.`);
   output.stream = createWriteStream(`./log/all/${output.filename}.log`);
   output.log = new Logger(output.stream);
 
-  const sm = spawn(`node`, [`${dirname(fileURLToPath(import.meta.url))}/process.js`], {
+  const startPath = dirname(fileURLToPath(import.meta.url)) + `/process.js`;
+  output.log.debug(`Starting child process: ${startPath}`);
+
+  const sm = fork(startPath, {
     env: {
       FORCE_COLOR: `true`
     },
@@ -114,14 +116,24 @@ function start() {
     });
   }
 
-  sm.on(`message`, (data: any) => {
-    switch (data.t) {
-      case `LOG`:
-        console.log(data.c.color);
-        output.stream.write(data.c.plain);
-        break;
-      default:
-        output.log.debug(inspect(data)); // to the debugeon with you
+  sm.on(`message`, (data: unknown) => {
+    if (data === null) {
+      output.log.warn(`Child process sent null message.`);
+      return;
+    }
+
+    if (typeof data === `object`) {
+      const dataObject = data as IPCLoggerObject;
+      switch (dataObject.t) {
+        case `LOG`:
+          console.log(dataObject.c.color);
+          output.stream.write(dataObject.c.plain);
+          break;
+        default:
+          output.log.debug(inspect(dataObject)); // to the debugeon with you
+      }
+    } else {
+      output.log.debug(inspect(data)); // to the debugeon with you
     }
   });
 
