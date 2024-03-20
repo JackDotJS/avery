@@ -1,7 +1,7 @@
 import { Logger } from './util/logger.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { readdirSync } from 'fs';
+import { readdirSync, existsSync } from 'fs';
 // eslint-disable-next-line @typescript-eslint/quotes
 import keys from '../config/keys.json' assert { type: 'json' };
 import { Client, GatewayIntentBits as Intents, ClientOptions, Partials } from 'discord.js';
@@ -35,10 +35,14 @@ bot.on(`ready`, (client) => {
     `Successfully connected with ${client.guilds.cache.size} guild(s) (${av} available)`
   ].join(`\n`));
 
-  for (const file of readdirSync(`${dirname(fileURLToPath(import.meta.url))}/modules/`)) {
-    import(`./modules/${file}`).then(() => {
-      log.info(`Loaded module from ${file}`);
-    });
+  const modulesDir = `${dirname(fileURLToPath(import.meta.url))}/modules/`;
+
+  if (existsSync(modulesDir)) {
+    for (const file of readdirSync(modulesDir)) {
+      import(`./modules/${file}`).then(() => {
+        log.info(`Loaded module from ${file}`);
+      });
+    }
   }
 });
 
