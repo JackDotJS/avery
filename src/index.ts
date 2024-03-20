@@ -1,5 +1,5 @@
 import { fork } from 'child_process';
-import { createWriteStream, copyFileSync, WriteStream } from 'fs';
+import { createWriteStream, copyFileSync, WriteStream, existsSync, mkdirSync } from 'fs';
 import { inspect } from 'util';
 import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
@@ -89,6 +89,19 @@ const exit = (code: number) => {
 };
 
 function start() {
+  const createDirs = [
+    `./log`,
+    `./log/all`,
+    `./log/crash`
+  ];
+
+  // create log directories if they don't exist already
+  for (const directory of createDirs) {
+    if (!existsSync(directory)) {
+      mkdirSync(directory);
+    }
+  }
+
   output.filename = new Date().toUTCString().replace(/[/\\?%*:|"<>]/g, `.`);
   output.stream = createWriteStream(`./log/all/${output.filename}.log`);
   output.log = new Logger(output.stream);
