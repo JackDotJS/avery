@@ -1,5 +1,5 @@
-import { fork } from 'child_process';
-import { createWriteStream, copyFileSync, WriteStream, existsSync, mkdirSync } from 'fs';
+import { ChildProcess, fork } from 'child_process';
+import { createWriteStream, copyFileSync, WriteStream, existsSync, mkdirSync, readdirSync } from 'fs';
 import { inspect } from 'util';
 import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
@@ -9,107 +9,60 @@ import { Logger, IPCLoggerObject } from './util/logger.js';
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from '../config/config.json' assert { type: 'json' };
 
-type output = {
-  log: Logger
-  filename: string,
-  stream: WriteStream
-};
+interface ModuleInfo {
+  process: ChildProcess,
+  name: string,
+  spawnTimestamp: Date,
+  lastRespawn: Date,
+  totalRespawns: number,
+  respawnWarnCounter: number
+}
 
-const output = {} as output;
+const activeModules: ModuleInfo[] = [];
 
-let resets = 0;
-const resetTime: number = Date.now();
+const modulesDir = `${dirname(fileURLToPath(import.meta.url))}/modules/`;
+if (!existsSync(modulesDir)) {
+  throw new Error(`Could not find modules directory at ${modulesDir}`);
+}
 
-const exit = (code: number) => {
-  // https://nodejs.org/api/process.html#process_exit_codes
-  output.log.warn(`Child process closed with exit code ${code}`);
-
-  let exit = true;
-  let report = true;
-  let checkLoop = true;
-
-  switch (code) {
-    case 0:
-      output.log.info(`Process complete or shutting down at user request.`);
-      report = false;
-      checkLoop = false;
-      break;
-    case 1:
-      output.log.info(`Process seems to have crashed. Restarting...`, `info`);
-      exit = false;
-      break;
-    case 16:
-      output.log.info(`Process restarting at user request...`, `info`);
-      exit = false;
-      report = false;
-      checkLoop = false;
-      break;
-    case 17:
-      output.log.info(`Process undergoing scheduled restart.`, `info`);
-      exit = false;
-      report = false;
-      checkLoop = false;
-      break;
-    case 18:
-      output.log.info(`Process shutting down automatically.`, `fatal`);
-      checkLoop = false;
-      break;
-  }
-
-  if (checkLoop) {
-    // if it's been more than 1 hour since last restart, reset the counter
-    if (resetTime + (1000 * 60 * 60) > Date.now()) {
-      resets = 0;
-    }
-
-    if (resets >= cfg.resets.warningThreshold) {
-      output.log.warn(`Unusually high client reset count: ${resets}`);
-    }
-
-    if (resets >= cfg.resets.shutdownThreshold) {
-      output.log.fatal(`Boot loop possibly detected, shutting down for safety.`);
-      exit = true;
-      report = true;
+function getModuleIndex(targetModuleName: string): number {
+  for (let i = 0; i < activeModules.length; i++) {
+    const module = activeModules[i];
+    if (module.name === targetModuleName) {
+      return i;
     }
   }
 
-  output.stream.close();
+  return -1;
+}
 
-  if (report) {
-    copyFileSync(output.stream.path, `./log/crash/${basename(output.stream.path.toString())}`);
+function checkAllModulesClosed() {
+  if (activeModules.length === 0) {
+    console.log(`All modules permanently closed. Exiting...`);
+    process.exit();
   }
-  
-  if (exit) {
-    process.exit(code);
-  }
+}
 
-  setTimeout(() => {
-    start();
-  }, 10000);
-};
-
-function start() {
+function spawnModule(modulePath: string, moduleName: string) {
   const createDirs = [
-    `./log`,
-    `./log/all`,
-    `./log/crash`
+    `./log/${moduleName}/all`,
+    `./log/${moduleName}/crash`
   ];
-
+  
   // create log directories if they don't exist already
   for (const directory of createDirs) {
     if (!existsSync(directory)) {
-      mkdirSync(directory);
+      mkdirSync(directory, { recursive: true });
     }
   }
 
-  output.filename = new Date().toUTCString().replace(/[/\\?%*:|"<>]/g, `.`);
-  output.stream = createWriteStream(`./log/all/${output.filename}.log`);
-  output.log = new Logger(output.stream);
+  const sanitizedDate = new Date().toUTCString().replace(/[/\\?%*:|"<>]/g, `.`);
+  const logStream = createWriteStream(`./log/${moduleName}/all/${sanitizedDate}.log`);
+  const mlog = new Logger(logStream);
 
-  const startPath = dirname(fileURLToPath(import.meta.url)) + `/process.js`;
-  output.log.debug(`Starting child process: ${startPath}`);
+  mlog.debug(`Starting module "${moduleName}"`);
 
-  const sm = fork(startPath, {
+  const sm = fork(modulePath, {
     env: {
       FORCE_COLOR: `true`
     },
@@ -121,17 +74,34 @@ function start() {
     sm.stderr.setEncoding(`utf8`);
 
     sm.stdout.on(`data`, (data) => {
-      output.log.info(data);
+      mlog.info(data);
     });
     
     sm.stderr.on(`data`, (data) => {
-      output.log.error(data);
+      mlog.error(data);
+    });
+  }
+
+  const existingModuleIndex = getModuleIndex(moduleName);
+  if (existingModuleIndex > -1) {
+    activeModules[existingModuleIndex].process = sm;
+    activeModules[existingModuleIndex].lastRespawn = new Date();
+    activeModules[existingModuleIndex].totalRespawns++;
+    activeModules[existingModuleIndex].respawnWarnCounter++;
+  } else {
+    activeModules.push({
+      process: sm,
+      name: moduleName,
+      spawnTimestamp: new Date(),
+      lastRespawn: new Date(),
+      totalRespawns: 0,
+      respawnWarnCounter: 0
     });
   }
 
   sm.on(`message`, (data: unknown) => {
     if (data === null) {
-      output.log.warn(`Child process sent null message.`);
+      mlog.warn(`Module "${moduleName}" sent null message.`);
       return;
     }
 
@@ -140,21 +110,119 @@ function start() {
       switch (dataObject.t) {
         case `LOG`:
           console.log(dataObject.c.color);
-          output.stream.write(dataObject.c.plain);
+          logStream.write(dataObject.c.plain);
+          break;
+        case `IPC`:
+          // TODO: IPC between modules
           break;
         default:
-          output.log.debug(inspect(dataObject)); // to the debugeon with you
+          mlog.debug(inspect(dataObject)); // to the debugeon with you
       }
     } else {
-      output.log.debug(inspect(data)); // to the debugeon with you
+      mlog.debug(inspect(data)); // to the debugeon with you
     }
   });
 
   sm.on(`error`, err => {
-    output.log.fatal(err.stack);
+    mlog.fatal(err.stack);
   });
 
-  sm.on(`close`, exit);
+  sm.on(`close`, (code, signal) => {
+    // https://nodejs.org/api/process.html#process_exit_codes
+    mlog.warn(`Child process of module "${moduleName}" closed with exit code ${code}`);
+
+    let exit = true;
+    let report = true;
+    let checkLoop = true;
+
+    if (code != null) {
+      switch (code) {
+        case 0:
+          mlog.info(`(${moduleName}) Process complete or shutting down at user request.`);
+          report = false;
+          checkLoop = false;
+          break;
+        case 1:
+          mlog.info(`(${moduleName}) Process seems to have crashed. Restarting...`);
+          exit = false;
+          break;
+        case 16:
+          mlog.info(`(${moduleName}) Process restarting at user request...`);
+          exit = false;
+          report = false;
+          checkLoop = false;
+          break;
+        case 17:
+          mlog.info(`(${moduleName}) Process undergoing scheduled restart.`);
+          exit = false;
+          report = false;
+          checkLoop = false;
+          break;
+        case 18:
+          mlog.fatal(`(${moduleName}) Process shutting down automatically.`);
+          checkLoop = false;
+          break;
+      }
+    } else {
+      mlog.fatal(`(${moduleName}) Process terminated via POSIX signal: ${signal}`);
+      checkLoop = false;
+    }
+
+    if (checkLoop) {
+      const mIndex = getModuleIndex(moduleName);
+      if (mIndex > -1) {
+        const mLastRespawn = activeModules[mIndex].lastRespawn.getTime();
+        const mRespawns = activeModules[mIndex].respawnWarnCounter;
+        // if it's been more than 1 hour since last restart, reset the counter
+        if (mLastRespawn + (1000 * 60 * 60) > Date.now()) {
+          activeModules[mIndex].respawnWarnCounter = 0;
+        }
+
+        if (mRespawns >= cfg.resets.warningThreshold) {
+          mlog.warn(`(${moduleName}) Unusually high client reset count: ${mRespawns}`);
+        }
+
+        if (mRespawns >= cfg.resets.shutdownThreshold) {
+          mlog.fatal(`(${moduleName}) Boot loop possibly detected, shutting down for safety.`);
+          exit = true;
+          report = true;
+        }
+      } else {
+        mlog.warn(`this should literally never ever happen!!!`);
+      }
+    }
+
+    logStream.close();
+
+    if (report) {
+      copyFileSync(logStream.path, `./log/crash/${basename(logStream.path.toString())}`);
+
+      // TODO: notify other modules through IPC
+    }
+    
+    if (exit) {
+      const mIndexFinal = getModuleIndex(moduleName);
+      if (mIndexFinal > -1) {
+        activeModules.splice(mIndexFinal, 1);
+      } else {
+        console.warn(`this should literally never ever happen!!!`);
+      }
+
+      // TODO: notify other modules through IPC
+
+      checkAllModulesClosed();
+    } else {
+      setTimeout(() => {
+        spawnModule(modulePath, moduleName);
+      }, 3000);
+    }
+  });
 }
 
-start();
+for (const dirEntry of readdirSync(modulesDir, { withFileTypes: true })) {
+  if (!dirEntry.isDirectory()) continue;
+
+  if (existsSync(`${modulesDir}/${dirEntry.name}/index.js`)) {
+    spawnModule(`${modulesDir}/${dirEntry.name}/index.js`, dirEntry.name);
+  }
+}

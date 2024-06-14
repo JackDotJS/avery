@@ -1,13 +1,13 @@
-import { Logger } from './util/logger.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { readdirSync, existsSync } from 'fs';
-// eslint-disable-next-line @typescript-eslint/quotes
-import keys from '../config/keys.json' assert { type: 'json' };
+import keys from '../../../config/keys.json' assert { type: 'json' };
 import { Client, GatewayIntentBits as Intents, ClientOptions, Partials } from 'discord.js';
 import memory from './memory.js';
+import { Logger } from '../../util/logger.js';
 
-const log = new Logger();
+memory.log = new Logger();
+const log = memory.log;
 
 const djsOpts: ClientOptions = {
   presence: {
@@ -24,7 +24,7 @@ const djsOpts: ClientOptions = {
   ]
 };
 
-export const bot = new Client(djsOpts);
+const bot = new Client(djsOpts);
 memory.bot = bot;
 
 bot.on(`ready`, (client) => {
@@ -35,15 +35,15 @@ bot.on(`ready`, (client) => {
     `Successfully connected with ${client.guilds.cache.size} guild(s) (${av} available)`
   ].join(`\n`));
 
-  const modulesDir = `${dirname(fileURLToPath(import.meta.url))}/modules/`;
+  // const modulesDir = `${dirname(fileURLToPath(import.meta.url))}/modules/`;
 
-  if (existsSync(modulesDir)) {
-    for (const file of readdirSync(modulesDir)) {
-      import(`./modules/${file}`).then(() => {
-        log.info(`Loaded module from ${file}`);
-      });
-    }
-  }
+  // if (existsSync(modulesDir)) {
+  //   for (const file of readdirSync(modulesDir)) {
+  //     import(`./modules/${file}`).then(() => {
+  //       log.info(`Loaded module from ${file}`);
+  //     });
+  //   }
+  // }
 });
 
 // guild status
