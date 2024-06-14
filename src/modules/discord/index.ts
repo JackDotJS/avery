@@ -2,7 +2,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { readdirSync, existsSync } from 'fs';
 import keys from '../../../config/keys.json' assert { type: 'json' };
-import { Client, GatewayIntentBits as Intents, ClientOptions, Partials } from 'discord.js';
+import fbStrings from '../../../config/strings.json' assert { type: 'json' };
+import { Client, GatewayIntentBits as Intents, ClientOptions, Partials, ActivityType } from 'discord.js';
 import memory from './memory.js';
 import { Logger } from '../../util/logger.js';
 
@@ -11,7 +12,14 @@ const log = memory.log;
 
 const djsOpts: ClientOptions = {
   presence: {
-    status: `online`
+    status: `online`,
+    activities: [
+      {
+        name: `You aren't supposed to see this!`,
+        state: fbStrings.status[0],
+        type: ActivityType.Custom
+      }
+    ]
   },
   allowedMentions: { parse: [`users`, `roles`] }, // remove this line to die instantly
   intents: [
@@ -44,6 +52,43 @@ bot.on(`ready`, (client) => {
   //     });
   //   }
   // }
+});
+
+// periodically update custom status string
+
+setInterval(() => {
+  if (!bot.user) return;
+
+  const currentStatus = bot.user.presence.activities[0];
+  const rIndex = Math.floor(Math.random() * fbStrings.status.length);
+  let rString = fbStrings.status[rIndex];
+
+  // ensures we dont just pick the same string again
+  if (rString === currentStatus.state) {
+    if (rIndex === (fbStrings.status.length - 1)) {
+      // if we're at the end of the array, use previous string
+      rString = fbStrings.status[rIndex - 1];
+    } else {
+      // ...otherwise use next string in array
+      rString = fbStrings.status[rIndex + 1];
+    }
+  }
+
+  bot.user.setActivity({
+    name: currentStatus.name,
+    state: rString,
+    type: currentStatus.type
+  });
+}, (1000 * 30)).unref();
+
+// reply to mentions/pings
+
+bot.on(`messageCreate`, (message) => {
+  if (bot.user == null) return;
+
+  if (message.mentions.has(bot.user.id)) {
+    message.reply(fbStrings.mention[Math.floor(Math.random() * fbStrings.mention.length)]);
+  }
 });
 
 // guild status
