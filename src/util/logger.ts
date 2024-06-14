@@ -39,7 +39,32 @@ export class Logger {
     return `unknown`;
   };
 
-  format = (content: unknown, level: string, source?: string) => {
+  sanitize = (item: unknown) => {
+    let rv = item;
+
+    if (typeof item !== `string`) {
+      if (item instanceof Error) {
+        rv = item.stack;
+      } else if (Buffer.isBuffer(item)) {
+        rv = item.toString();
+      } else {
+        rv = inspect(item, { getters: true, showHidden: true });
+      }
+    }
+
+    return rv;
+  };
+
+  preformat = (content: unknown[], loglevel: string) => {
+    const sanitized = [];
+    for (const item of content) {
+      sanitized.push(this.sanitize(item));
+    }
+
+    this.format(sanitized.join(` `), loglevel, this.getSource(new Error().stack));
+  };
+
+  format = (content: string, level: string, source?: string) => {
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2, `0`);
     const mm = now.getUTCMinutes().toString().padStart(2, `0`);
@@ -91,17 +116,6 @@ export class Logger {
       }
     }
   
-    if (typeof content !== `string`) {
-      message.color = chalk.yellowBright;
-      if (content instanceof Error) {
-        message.content = content.stack;
-      } else if (Buffer.isBuffer(content)) {
-        message.content = content.toString();
-      } else {
-        message.content = inspect(content, { getters: true, showHidden: true });
-      }
-    }
-  
     const plain1 = `[${timestamp.content}] [${filePath.content}] [${logLevel.content}] : `;
     const plain2 = (message.content as string).replace(/\n/g, `\n${(` `.repeat(plain1.length))}`).trim() + `\n`;
   
@@ -133,22 +147,22 @@ export class Logger {
   };
 
   debug = (...content: unknown[]) => {
-    this.format(content.join(` `), `debug`, this.getSource(new Error().stack));
+    this.preformat(content, `debug`);
   };
 
   info = (...content: unknown[]) => {
-    this.format(content.join(` `), `info`, this.getSource(new Error().stack));
+    this.preformat(content, `info`);
   };
 
   warn = (...content: unknown[]) => {
-    this.format(content.join(` `), `warn`, this.getSource(new Error().stack));
+    this.preformat(content, `warn`);
   };
 
   error = (...content: unknown[]) => {
-    this.format(content.join(` `), `error`, this.getSource(new Error().stack));
+    this.preformat(content, `error`);
   };
 
   fatal = (...content: unknown[]) => {
-    this.format(content.join(` `), `fatal`, this.getSource(new Error().stack));
+    this.preformat(content, `fatal`);
   };
 }
