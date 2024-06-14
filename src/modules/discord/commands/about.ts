@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import pkg from "../../../../package.json";
+import pkg from "../../../../package.json" assert { type: 'json' };
 
 export const metadata = new SlashCommandBuilder()
   .setName(`about`)
   .setDescription(`Gives some basic information about FeatherBot.`);
 
-export async function response(interaction: ChatInputCommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
   const embed = new EmbedBuilder()
     .setColor(`#F34848`)
     .setTitle(`FeatherBot ${pkg.version}`)

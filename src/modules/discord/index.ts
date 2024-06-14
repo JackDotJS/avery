@@ -32,6 +32,28 @@ const djsOpts: ClientOptions = {
   ]
 };
 
+const cmdsDir = `${dirname(fileURLToPath(import.meta.url))}/commands`;
+
+log.debug(cmdsDir);
+
+if (existsSync(cmdsDir)) {
+  for (const item of readdirSync(cmdsDir, { withFileTypes: true })) {
+    if (item.isDirectory()) continue;
+
+    import(`${cmdsDir}/${item.name}`).then((command) => {
+      if (command.metadata == null || command.execute == null) {
+        log.debug(command);
+        return log.warn(`Invalid command: ${item.name}`);
+      }
+
+      memory.commands.push(command);
+      log.info(`Loaded command from ${item.name}`);
+    });
+  }
+} else {
+  throw new Error(`Could not find command directory: ${cmdsDir}`);
+}
+
 const bot = new Client(djsOpts);
 memory.bot = bot;
 
@@ -43,15 +65,7 @@ bot.on(`ready`, (client) => {
     `Successfully connected with ${client.guilds.cache.size} guild(s) (${av} available)`
   ].join(`\n`));
 
-  // const modulesDir = `${dirname(fileURLToPath(import.meta.url))}/modules/`;
-
-  // if (existsSync(modulesDir)) {
-  //   for (const file of readdirSync(modulesDir)) {
-  //     import(`./modules/${file}`).then(() => {
-  //       log.info(`Loaded module from ${file}`);
-  //     });
-  //   }
-  // }
+  log.debug(memory.commands);
 });
 
 // periodically update custom status string
