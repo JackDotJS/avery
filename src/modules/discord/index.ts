@@ -1,6 +1,5 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { readdirSync, existsSync } from 'fs';
 import keys from '../../../config/keys.json' assert { type: 'json' };
 import fbStrings from '../../../config/strings.json' assert { type: 'json' };
 import { Client, GatewayIntentBits as Intents, ClientOptions, Partials, ActivityType } from 'discord.js';
@@ -32,30 +31,10 @@ const djsOpts: ClientOptions = {
   ]
 };
 
-const cmdsDir = `${dirname(fileURLToPath(import.meta.url))}/commands`;
-
-log.debug(cmdsDir);
-
-if (existsSync(cmdsDir)) {
-  for (const item of readdirSync(cmdsDir, { withFileTypes: true })) {
-    if (item.isDirectory()) continue;
-
-    import(`${cmdsDir}/${item.name}`).then((command) => {
-      if (command.metadata == null || command.execute == null) {
-        log.debug(command);
-        return log.warn(`Invalid command: ${item.name}`);
-      }
-
-      memory.commands.push(command);
-      log.info(`Loaded command from ${item.name}`);
-    });
-  }
-} else {
-  throw new Error(`Could not find command directory: ${cmdsDir}`);
-}
-
 const bot = new Client(djsOpts);
 memory.bot = bot;
+
+let loaded = false;
 
 bot.on(`ready`, (client) => {
   const av = client.guilds.cache.filter(g => g.available).size;
@@ -65,43 +44,14 @@ bot.on(`ready`, (client) => {
     `Successfully connected with ${client.guilds.cache.size} guild(s) (${av} available)`
   ].join(`\n`));
 
-  log.debug(memory.commands);
-});
+  if (!loaded) {
+    loaded = true;
 
-// periodically update custom status string
+    const cwd = dirname(fileURLToPath(import.meta.url));
 
-setInterval(() => {
-  if (!bot.user) return;
-
-  const currentStatus = bot.user.presence.activities[0];
-  const rIndex = Math.floor(Math.random() * fbStrings.status.length);
-  let rString = fbStrings.status[rIndex];
-
-  // ensures we dont just pick the same string again
-  if (rString === currentStatus.state) {
-    if (rIndex === (fbStrings.status.length - 1)) {
-      // if we're at the end of the array, use previous string
-      rString = fbStrings.status[rIndex - 1];
-    } else {
-      // ...otherwise use next string in array
-      rString = fbStrings.status[rIndex + 1];
-    }
-  }
-
-  bot.user.setActivity({
-    name: currentStatus.name,
-    state: rString,
-    type: currentStatus.type
-  });
-}, (1000 * 30)).unref();
-
-// reply to mentions/pings
-
-bot.on(`messageCreate`, (message) => {
-  if (bot.user == null) return;
-
-  if (message.mentions.has(bot.user.id)) {
-    message.reply(fbStrings.mention[Math.floor(Math.random() * fbStrings.mention.length)]);
+    import(`${cwd}/commandLoader.js`);
+    import(`${cwd}/presenceUpdater.js`);
+    import(`${cwd}/messageHandler.js`);
   }
 });
 
@@ -125,14 +75,10 @@ bot.on(`guildUpdate`, (oldGuild, newGuild) => {
 
 // websocket status events
 
-// Removed these two properties because they're deprecated and don't provide
-// any real data anyway.
 bot.on(`shardDisconnect`, (event) => {
   log.warn([
     `=== Discord API Disconnect! ===`,
-    // `Disconnect Reason: ${event.reason}`,
     `Event Code: ${event.code}`,
-    // `wasClean: ${event.wasClean}`
   ].join(`\n`));
 });
 
