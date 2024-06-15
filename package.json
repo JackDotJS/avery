@@ -8,8 +8,9 @@
     "url": "https://github.com/JackDotJS/featherbot"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "pnpm build && node build/src/index.js"
+    "cleanup": "rm -rf ./build",
+    "build": "tsc --outDir ./build",
+    "start": "pnpm cleanup && pnpm build && node build/src/index.js"
   },
   "type": "module",
   "dependencies": {
