@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import pkg from "../../../../package.json" assert { type: 'json' };
+import pkg from "../../../package.json" assert { type: 'json' };
 
 export const metadata = new SlashCommandBuilder()
   .setName(`about`)
