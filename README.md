@@ -1,5 +1,5 @@
-# featherbot
-big wip
+# avery
+super cool bot for my discord/revolt server (big wip)
 
 main features on the todo list:
 - custom discord-revolt bridge
