@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
 import { Logger, IPCLoggerObject } from './util/logger.js';
 
+// TODO: module-agnostic global logs
+
 // typescript eslint doesn't understand yet that import assertions require normal quotes
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from '../config/config.json' assert { type: 'json' };

@@ -1,6 +1,8 @@
-import { EmbedBuilder, Message as DiscordMessage } from "discord.js";
+import { EmbedBuilder, Message as DiscordMessage, ColorResolvable } from "discord.js";
 import { Message as RevoltMessage } from "revolt.js"
 import pkg from "../../package.json" assert { type: 'json' };
+// eslint-disable-next-line @typescript-eslint/quotes
+import cfg from '../../config/config.json' assert { type: 'json' };
 
 export const metadata: CommandMetadata = {
   name: `about`,
@@ -12,7 +14,7 @@ export const revolt = { execute: revoltHandler };
 
 async function discordHandler(message: DiscordMessage) {
   const embed = new EmbedBuilder()
-    .setColor(`#F34848`)
+    .setColor(cfg.discord.colors.default as ColorResolvable)
     .setTitle(`Avery ${pkg.version}`)
     .setDescription(`The best bot in the entire world.`)
     .addFields({
@@ -27,7 +29,7 @@ async function discordHandler(message: DiscordMessage) {
 
 async function revoltHandler(message: RevoltMessage) {
   const embed = {
-    colour: `#F34848`,
+    colour: cfg.revolt.colors.default,
     title: `Avery ${pkg.version}`,
     description: [
       `The best bot in the entire world.`,

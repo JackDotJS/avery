@@ -1,7 +1,7 @@
 import memory from './memory.js';
-import fbStrings from '../../../config/strings.json' assert { type: 'json' }; 
-import { ChannelType, MessageType } from 'discord.js';
+import { ChannelType, ColorResolvable, EmbedBuilder, MessageType } from 'discord.js';
 import { getFunnyString } from '../../util/randomFunnyString.js';
+import cfg from '../../../config/config.json' assert { type: 'json' };
 
 if (!memory.log) throw new Error(`memory.log is null!`);
 const log = memory.log;
@@ -38,7 +38,15 @@ bot.on(`messageCreate`, (message) => {
       }
     }
 
-    message.reply(`unknown command`);
+    // default response
+    const embed = new EmbedBuilder()
+    .setColor(cfg.discord.colors.error as ColorResolvable)
+    .setTitle(`Unknown Command`)
+
+    message.reply({
+      embeds: [ embed ]
+    });
+
     return;
   }
 
