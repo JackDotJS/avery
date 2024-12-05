@@ -1,17 +1,10 @@
 import { Logger } from '../../util/logger.js';
-import { ChatInputCommandInteraction, Client } from 'discord.js';
-
-type FBSlashCommandExecutable = (interaction: ChatInputCommandInteraction) => void;
-
-interface FBSlashCommandTemplate {
-  metadata: object,
-  execute: FBSlashCommandExecutable
-}
+import { Client } from 'discord.js';
 
 interface MemoryInterface {
   log: Logger | null,
   bot: Client | null,
-  commands: FBSlashCommandTemplate[]
+  commands: CommandModule[]
 }
 
 const memory: MemoryInterface = {
