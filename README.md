@@ -1,4 +1,4 @@
-# avery
+# Avery
 work in progress discord/revolt bot
 
 planned features:
@@ -7,9 +7,13 @@ planned features:
 - support account linking
     - i originally imagined this would just be useful for moderators so the callmod command could work cross-platform, but this would definitely be useful for users as well. nicknames, roles, xp, economy stuff, etc.
 - support for shared server emoji
+    - in other words, if someone uses a custom emote, it should automatically be translated when the message is copied to the opposing platform.
 - support for deleting messages across both platforms (up to 24hrs old)
-- support for reactions (this will be *really* janky, but it'll technically work)
-- support for pinned messages (again, super janky, but it should work)
+- support for reactions
+    - current idea is that reactions added to a message on one platform will simply be added by the bot on the opposite platform, and users can use a command to check how many reactions have been added to the message and by whom. kinda janky, but it'll technically work.
+- support for pinned messages
+    - needs more discussion.
+    - new message pin notifications can be sent cross-platform easily, but actually pinning messages cross-platform would be incredibly difficult. revolt does not have pinned messages (at least not user-facing), and being able to get the same messages across platforms to be able to pin them beyond a certain period is impossible.
 - support for message replies (up to 24hrs old)
 - message buffering (save and resend messages when one platform/server is temporarily unavailable)
 - mirror announcement channel feeds and webhooks
@@ -95,3 +99,4 @@ planned features:
 
 ## Miscellaneous
 - reaction roles (and role command for the odd occasion where these dont work)
+- in-channel notifications for name/description changes
