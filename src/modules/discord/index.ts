@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import keys from '../../../config/keys.json' assert { type: 'json' };
-import fbStrings from '../../../config/strings.json' assert { type: 'json' };
+import funnyStrings from '../../../config/strings.json' assert { type: 'json' };
 import { Client, GatewayIntentBits as Intents, ClientOptions, Partials, ActivityType } from 'discord.js';
 import memory from './memory.js';
 import { Logger } from '../../util/logger.js';
@@ -15,7 +15,7 @@ const djsOpts: ClientOptions = {
     activities: [
       {
         name: `You aren't supposed to see this!`,
-        state: fbStrings.status[0],
+        state: funnyStrings.status[0],
         type: ActivityType.Custom
       }
     ]

@@ -1,6 +1,7 @@
 import memory from './memory.js';
 import fbStrings from '../../../config/strings.json' assert { type: 'json' }; 
 import { ChannelType, MessageType } from 'discord.js';
+import { getFunnyString } from '../../util/randomFunnyString.js';
 
 if (!memory.log) throw new Error(`memory.log is null!`);
 const log = memory.log;
@@ -18,13 +19,13 @@ bot.on(`messageCreate`, (message) => {
   if (message.type !== MessageType.Default) return;
   if (message.channel.type === ChannelType.DM) return;
 
-  // handle bot mentions
+  // bot mention handler
   if (message.mentions.has(bot.user.id)) {
-    message.reply(fbStrings.mention[Math.floor(Math.random() * fbStrings.mention.length)]);
+    message.reply(getFunnyString(`mention`));
     return;
   }
 
-  // handle commands
+  // command handler
   if (cmdrgx.test(message.content)) {
     const inputArgs = message.content.slice(1).trim().split(/ +/g);
     const inputCmd = inputArgs.shift()?.toLowerCase();
@@ -39,5 +40,12 @@ bot.on(`messageCreate`, (message) => {
 
     message.reply(`unknown command`);
     return;
+  }
+
+  // standard message handler
+  const chance = 1 / 1337;
+  // const chance = 1; // for debugging only
+  if (Math.random() < chance) {
+    message.reply(`User was ${getFunnyString(`user_was_x`)} for this post`);
   }
 });
