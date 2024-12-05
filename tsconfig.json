@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "es2022",
-    "module": "esnext",
+    "target": "ESNext",
+    "module": "ESNext",
     "strict": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noFallthroughCasesInSwitch": true,
-    "incremental": true,
     "lib": [
-      "es2020"
-    ]
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true
   },
   "include": ["src", "config"],
 }
