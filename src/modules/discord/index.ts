@@ -24,7 +24,8 @@ const djsOpts: ClientOptions = {
   intents: [
     // https://discord.com/developers/docs/topics/gateway#list-of-intents
     Intents.Guilds,
-    Intents.GuildMessages
+    Intents.GuildMessages,
+    Intents.MessageContent
   ],
   partials: [
     Partials.Channel
