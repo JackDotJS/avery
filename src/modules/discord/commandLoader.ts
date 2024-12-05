@@ -6,27 +6,32 @@ import memory from './memory.js';
 if (!memory.log) throw new Error(`memory.log is null!`);
 const log = memory.log;
 
-const cmdDirs = [
-  resolve(`${dirname(fileURLToPath(import.meta.url))}../../../commands/global`),
-  resolve(`${dirname(fileURLToPath(import.meta.url))}../../../commands/discord`)
-];
+const cmdDir = resolve(`${dirname(fileURLToPath(import.meta.url))}../../../commands`);
 
-for (const dir of cmdDirs) {
-  if (existsSync(dir)) {
-    for (const item of readdirSync(dir, { withFileTypes: true })) {
-      if (item.isDirectory()) continue;
-  
-      import(`${dir}/${item.name}`).then((command) => {
-        if (command.metadata == null || command.execute == null) {
-          log.debug(command);
-          return log.warn(`Invalid command: ${item.name}`);
-        }
-  
-        memory.commands.push(command);
-        log.info(`Loaded command from ${item.name}`);
-      });
-    }
-  } else {
-    log.error(new Error(`Could not find command directory: ${dir}`));
-  }
+if (!existsSync(cmdDir)) {
+  throw new Error(`Could not find command directory: ${cmdDir}`);
 }
+
+for (const item of readdirSync(cmdDir, { withFileTypes: true })) {
+  if (item.isDirectory()) continue;
+
+  import(`${cmdDir}/${item.name}`).then((command) => {
+    if (command.metadata == null) {
+      log.debug(command);
+      return log.warn(`Could not load command "${item.name}" (Missing metadata)`);
+    }
+
+    if (command.discord == null) {
+      return log.info(`Could not load command "${item.name}" (Not executable in Discord context)`)
+    }
+
+    if (command.discord.execute == null) {
+      return log.warn(`Could not load command "${item.name}" (Missing executable function)`)
+    }
+
+    memory.commands.push(command);
+    log.info(`Successfully loaded command "${item.name}"`);
+  });
+}
+
+log.debug(memory.commands);
