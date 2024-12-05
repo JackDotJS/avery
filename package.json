@@ -18,7 +18,7 @@
     "bufferutil": "^4.0.8",
     "chalk": "^5.3.0",
     "discord.js": "^14.14.1",
-    "revolt.js": "7.0.0-beta.11",
+    "revolt.js": "^7.0.4",
     "utf-8-validate": "^6.0.3"
   },
   "devDependencies": {
@@ -27,5 +27,6 @@
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.57.0",
     "typescript": "^5.4.2"
-  }
+  },
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
 }
