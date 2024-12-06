@@ -6,6 +6,8 @@ import { Client, GatewayIntentBits as Intents, ClientOptions, Partials, Activity
 import memory from './memory.js';
 import { Logger } from '../../util/logger.js';
 
+// TODO: load commands before logging in
+
 memory.log = new Logger();
 const log = memory.log;
 

@@ -34,14 +34,20 @@ bot.on(`messageCreate`, (message) => {
 
     for (const cmd of memory.commands) {
       if (cmd.metadata.name === inputCmd) {
-        return cmd.discord.execute(message);
+        if (cmd.discordHandler == null) {
+          log.error(`found invalid command: ${cmd.metadata.name}`);
+          message.reply(`Error during execution: Command "${cmd.metadata.name}" does not contain a valid handler for this context. This should never happen!!!`);
+          return;
+        }
+
+        return cmd.discordHandler(message);
       }
     }
 
     // default response
     const embed = new EmbedBuilder()
-    .setColor(cfg.discord.colors.error as ColorResolvable)
-    .setTitle(`Unknown Command`)
+      .setColor(cfg.discord.colors.error as ColorResolvable)
+      .setTitle(`Unknown Command`);
 
     message.reply({
       embeds: [ embed ]
