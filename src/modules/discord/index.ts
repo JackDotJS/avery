@@ -1,6 +1,6 @@
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+// eslint-disable-next-line @typescript-eslint/quotes
 import keys from '../../../config/keys.json' assert { type: 'json' };
+// eslint-disable-next-line @typescript-eslint/quotes
 import funnyStrings from '../../../config/strings.json' assert { type: 'json' };
 import { Client, GatewayIntentBits as Intents, ClientOptions, Partials, ActivityType } from 'discord.js';
 import memory from './memory.js';

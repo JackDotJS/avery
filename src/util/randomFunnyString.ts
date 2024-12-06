@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/quotes
 import funnyStrings from '../../config/strings.json' assert { type: 'json' }; 
 
 const memoryLimit = 5;
@@ -12,7 +13,7 @@ export function getFunnyString(type: `user_was_x` | `mention` | `status`) {
   const target = funnyStrings[type];
 
   let attempts = 0;
-  let retryLimit = 10;
+  const retryLimit = 10;
   let selection = 0;
 
   // retry RNG until we get a number that hasn't
@@ -27,7 +28,7 @@ export function getFunnyString(type: `user_was_x` | `mention` | `status`) {
   do {
     selection = Math.floor(Math.random() * target.length);
     attempts++;
-  } while (lastUsed[type].includes(selection) && attempts < retryLimit)
+  } while (lastUsed[type].includes(selection) && attempts < retryLimit);
   
   // plan B: just offset the selection by 1 and call it a day.
   if (attempts === retryLimit) {

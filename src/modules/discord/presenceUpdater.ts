@@ -2,9 +2,6 @@ import memory from './memory.js';
 import { getFunnyString } from '../../util/randomFunnyString.js';
 
 export function initalizePresenceUpdater() {
-  if (!memory.log) throw new Error(`memory.log is null!`);
-  const log = memory.log;
-
   if (!memory.bot) throw new Error(`memory.bot is null!`);
   const bot = memory.bot;
 

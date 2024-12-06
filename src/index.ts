@@ -1,5 +1,5 @@
 import { ChildProcess, fork } from 'child_process';
-import { createWriteStream, copyFileSync, WriteStream, existsSync, mkdirSync, readdirSync } from 'fs';
+import { createWriteStream, copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { inspect } from 'util';
 import { fileURLToPath } from 'url';
 import { dirname, basename } from 'path';
