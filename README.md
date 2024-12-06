@@ -100,3 +100,4 @@ planned features:
 ## Miscellaneous
 - reaction roles (and role command for the odd occasion where these dont work)
 - in-channel notifications for name/description changes
+- starboard-like pinning function
