@@ -1,20 +1,22 @@
 import memory from './memory.js';
 import { getFunnyString } from '../../util/randomFunnyString.js';
 
-if (!memory.log) throw new Error(`memory.log is null!`);
-const log = memory.log;
+export function initalizePresenceUpdater() {
+  if (!memory.log) throw new Error(`memory.log is null!`);
+  const log = memory.log;
 
-if (!memory.bot) throw new Error(`memory.bot is null!`);
-const bot = memory.bot;
+  if (!memory.bot) throw new Error(`memory.bot is null!`);
+  const bot = memory.bot;
 
-setInterval(() => {
-  if (!bot.user) return;
+  setInterval(() => {
+    if (!bot.user) return;
 
-  const currentStatus = bot.user.presence.activities[0];
+    const currentStatus = bot.user.presence.activities[0];
 
-  bot.user.setActivity({
-    name: currentStatus.name,
-    state: getFunnyString(`status`),
-    type: currentStatus.type
-  });
-}, (1000 * 30)).unref();
+    bot.user.setActivity({
+      name: currentStatus.name,
+      state: getFunnyString(`status`),
+      type: currentStatus.type
+    });
+  }, (1000 * 30)).unref();
+}

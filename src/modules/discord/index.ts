@@ -5,11 +5,16 @@ import funnyStrings from '../../../config/strings.json' assert { type: 'json' };
 import { Client, GatewayIntentBits as Intents, ClientOptions, Partials, ActivityType } from 'discord.js';
 import memory from './memory.js';
 import { Logger } from '../../util/logger.js';
-
-// TODO: load commands before logging in
+import { initializeCommands } from './commandLoader.js';
+import { initializeMessageHandler } from './messageHandler.js';
+import { initalizePresenceUpdater } from './presenceUpdater.js';
 
 memory.log = new Logger();
 const log = memory.log;
+
+// ensure all commands are loaded correctly before even attempting to login
+// helps reduce api spam if there's a problem on our end
+await initializeCommands();
 
 const djsOpts: ClientOptions = {
   presence: {
@@ -49,12 +54,9 @@ bot.on(`ready`, (client) => {
 
   if (!loaded) {
     loaded = true;
-
-    const cwd = dirname(fileURLToPath(import.meta.url));
-
-    import(`${cwd}/commandLoader.js`);
-    import(`${cwd}/presenceUpdater.js`);
-    import(`${cwd}/messageHandler.js`);
+    
+    initalizePresenceUpdater();
+    initializeMessageHandler();
   }
 });
 
