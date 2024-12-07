@@ -3,39 +3,34 @@ import cfg from '../../config/config.json' assert { type: 'json' };
 
 export interface PermissionGroup {
   name: string,
+  inherits?: string,
   roles: string[]
 }
 
-export const permissionGroups: PermissionGroup[] = [];
+export const permissionGroups: PermissionGroup[] = [...cfg.permissionGroups];
 
-for (const group of cfg.permissionGroups) {
-  const finalGroupData = {
-    name: group.name,
-    roles: [...group.roles]
-  };
-
-  if (group.inherits == null) {
-    permissionGroups.push(finalGroupData);
-  } else {
-    const search = async (target: string): Promise<void> => {
-      for (const subgroup of cfg.permissionGroups) {
+for (const group of permissionGroups) {
+  if (group.inherits != null) {
+    const addToNext = (target: string, currentRoles: string[]) => {
+      for (const subgroup of permissionGroups) {
         if (subgroup.name === target) {
-          finalGroupData.roles.push(...subgroup.roles);
-
+          subgroup.roles.push(...currentRoles);
+          
           if (subgroup.inherits != null) {
-            return await search(subgroup.inherits);
+            addToNext(subgroup.inherits, subgroup.roles);
           }
         }
       }
-
-      return;
     };
 
-    await search(group.inherits);
+    addToNext(group.inherits, group.roles);
   }
 
-  permissionGroups.push(finalGroupData);
+  // just in case: ensure there's no duplicates
+  group.roles = [...new Set(group.roles)];
 }
+
+console.debug(permissionGroups);
 
 export function permissionCheck(roles: string[], targetGroups: string[]): boolean {
   let allowed = false;
