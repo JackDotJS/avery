@@ -8,8 +8,8 @@ export interface CommandMetadata {
   description: string
 }
 
-export type CommandDiscordHandler = ((message: DiscordMessage) => void) | null;
-export type CommandRevoltHandler = ((message: RevoltMessage) => void) | null;
+export type CommandDiscordHandler = ((message: DiscordMessage) => Promise<void>) | null;
+export type CommandRevoltHandler = ((message: RevoltMessage) => Promise<void>) | null;
 
 export class BaseCommand {
   metadata: CommandMetadata;

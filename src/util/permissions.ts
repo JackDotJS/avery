@@ -17,7 +17,7 @@ for (const group of cfg.permissionGroups) {
   if (group.inherits == null) {
     permissionGroups.push(finalGroupData);
   } else {
-    const search = async (target: string) => {
+    const search = async (target: string): Promise<void> => {
       for (const subgroup of cfg.permissionGroups) {
         if (subgroup.name === target) {
           finalGroupData.roles.push(...subgroup.roles);
@@ -27,6 +27,8 @@ for (const group of cfg.permissionGroups) {
           }
         }
       }
+
+      return;
     };
 
     await search(group.inherits);
