@@ -4,6 +4,8 @@ import { normalize } from 'path';
 import { inspect } from 'util';
 import { WriteStream } from 'fs';
 
+// TODO: fix filename thing not working
+
 export interface IPCLoggerObject {
   t: string,
   c: {
