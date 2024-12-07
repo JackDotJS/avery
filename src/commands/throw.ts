@@ -6,7 +6,8 @@ class ThrowCommand extends BaseCommand {
   constructor() {
     super({
       name: `throw`,
-      description: `error handler test`
+      description: `error handler test`,
+      permissionGroups: [ `admin` ]
     });
   }
 

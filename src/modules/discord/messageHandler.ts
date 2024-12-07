@@ -3,6 +3,7 @@ import { ChannelType, ColorResolvable, EmbedBuilder, MessageType } from 'discord
 import { getFunnyString } from '../../util/randomFunnyString.js';
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from '../../../config/config.json' assert { type: 'json' };
+import { permissionCheck } from '../../util/permissions.js';
 
 export function initializeMessageHandler() {
   if (!memory.log) throw new Error(`memory.log is null!`);
@@ -35,10 +36,34 @@ export function initializeMessageHandler() {
       log.debug(inputCmd, inputArgs);
 
       for (const cmd of memory.commands) {
+        // TODO: handle command aliases
         if (cmd.metadata.name === inputCmd) {
           try {
             if (cmd.discordHandler == null) {
               throw new Error(`Command "${cmd.metadata.name}" does not contain a valid handler for this context. This should never happen!!!`);
+            }
+
+            if (cmd.metadata.permissionGroups != null) {
+              const roles: string[] = [];
+
+              message.member?.roles.cache.forEach((roleObj) => {
+                roles.push(roleObj.id);
+              });
+
+              const allowed = permissionCheck(roles, cmd.metadata.permissionGroups);
+
+              if (!allowed) {
+                const deniedEmbed = new EmbedBuilder()
+                  .setColor(cfg.discord.colors.error as ColorResolvable)
+                  .setTitle(`Access Denied`)
+                  .setDescription(`You do not have permission to use this command.`);
+                
+                message.reply({
+                  embeds: [ deniedEmbed ]
+                });
+
+                return;
+              }
             }
   
             await cmd.discordHandler(message);

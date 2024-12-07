@@ -37,13 +37,18 @@ for (const group of cfg.permissionGroups) {
   permissionGroups.push(finalGroupData);
 }
 
-export function checkRole(role: string, targetGroup: string) {
-  for (const group of permissionGroups) {
-    if (group.name === targetGroup) {
-      return group.roles.includes(role);
+export function permissionCheck(roles: string[], targetGroups: string[]): boolean {
+  let allowed = false;
+  for (const role of roles) {
+    for (const group of permissionGroups) {
+      if (targetGroups.includes(group.name)) {
+        if (group.roles.includes(role)) {
+          allowed = true;
+          break;
+        }
+      }
     }
   }
 
-  // if we've made it here, then that can only mean the provided target group doesn't exist.
-  throw new Error(`invalid group name: ${targetGroup}`);
+  return allowed;
 }
