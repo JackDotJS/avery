@@ -13,7 +13,7 @@ export function initializeMessageHandler() {
 
   const cmdrgx = new RegExp(`^\\?[a-zA-Z0-9]+`);
 
-  bot.on(`messageCreate`, (message) => {
+  bot.on(`messageCreate`, async (message) => {
     if (bot.user == null) return;
     if (message.author.bot) return;
     if (message.author.system) return;
@@ -36,23 +36,44 @@ export function initializeMessageHandler() {
 
       for (const cmd of memory.commands) {
         if (cmd.metadata.name === inputCmd) {
-          if (cmd.discordHandler == null) {
-            log.error(`found invalid command: ${cmd.metadata.name}`);
-            message.reply(`Error during execution: Command "${cmd.metadata.name}" does not contain a valid handler for this context. This should never happen!!!`);
+          try {
+            if (cmd.discordHandler == null) {
+              throw new Error(`Command "${cmd.metadata.name}" does not contain a valid handler for this context. This should never happen!!!`);
+            }
+  
+            await cmd.discordHandler(message);
+            return;
+          } catch (error) {
+            if (error instanceof Error == false) {
+              log.error(error);
+              return log.error(`error is not an error? wtf`);
+            }
+
+            const errorEmbed = new EmbedBuilder()
+              .setColor(cfg.discord.colors.error as ColorResolvable)
+              .setTitle(`Error during execution`)
+              .setDescription([
+                `\`\`\``,
+                error.toString(),
+                `\`\`\``,
+              ].join(`\n`));
+            
+            message.reply({
+              embeds: [ errorEmbed ]
+            });
+            
             return;
           }
-
-          return cmd.discordHandler(message);
         }
       }
 
       // default response
-      const embed = new EmbedBuilder()
+      const defaultEmbed = new EmbedBuilder()
         .setColor(cfg.discord.colors.error as ColorResolvable)
         .setTitle(`Unknown Command`);
 
       message.reply({
-        embeds: [ embed ]
+        embeds: [ defaultEmbed ]
       });
 
       return;
