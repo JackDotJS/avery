@@ -33,7 +33,11 @@ export function initializeMessageHandler() {
       const inputArgs = message.content.slice(1).trim().split(/ +/g);
       const inputCmd = inputArgs.shift()?.toLowerCase();
 
-      log.debug(inputCmd, inputArgs);
+      log.info([
+        `Command issued by @${message.member?.user.username} (${message.member?.user.id}):`,
+        inputCmd,
+        inputArgs
+      ].join(` `));
 
       for (const cmd of memory.commands) {
         // TODO: handle command aliases
@@ -53,6 +57,8 @@ export function initializeMessageHandler() {
               const allowed = permissionCheck(roles, cmd.metadata.permissionGroups);
 
               if (!allowed) {
+                log.info(`User @${message.member?.user.username} (${message.member?.user.id}) failed to pass permission check`);
+
                 const deniedEmbed = new EmbedBuilder()
                   .setColor(cfg.discord.colors.error as ColorResolvable)
                   .setTitle(`Access Denied`)
@@ -69,8 +75,9 @@ export function initializeMessageHandler() {
             await cmd.discordHandler(message);
             return;
           } catch (error) {
+            log.error(error);
+
             if (error instanceof Error == false) {
-              log.error(error);
               return log.error(`error is not an error? wtf`);
             }
 
