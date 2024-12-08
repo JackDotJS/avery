@@ -4,8 +4,6 @@ import { normalize } from 'path';
 import { inspect } from 'util';
 import { WriteStream } from 'fs';
 
-// TODO: fix filename thing not working
-
 export interface IPCLoggerObject {
   t: string,
   c: {
@@ -16,6 +14,7 @@ export interface IPCLoggerObject {
 
 export class Logger {
   stream: WriteStream | null;
+  _filename: string;
 
   constructor(stream?: WriteStream) {
     if (stream != null) {
@@ -23,18 +22,30 @@ export class Logger {
     } else {
       this.stream = null;
     }
+
+    const thisFile = import.meta.filename.match(/(?<=\\|\/)[^\\/]*$/);
+    if (thisFile == null) throw new Error(`Failed regex on current filename. This should never happen!`);
+    this._filename = thisFile[0];
   }
 
   getSource = (trace?: string) => {
     if (typeof trace === `string`) {
-      const match = trace.split(`\n`)[2].match(/(?<=at\s|\()([^(]*):(\d+):(\d+)\)?$/);
+      const lines = trace.split(`\n`);
+      let indexCorrection = 0;
+
+      // cycle through the trace until we get the first line that doesn't have this same file
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(` at `) && lines[i].includes(this._filename) === false) {
+          indexCorrection = i;
+          break;
+        }
+      }
+
+      const match = lines[indexCorrection].match(/file:\/\/\/.*:(\d+):(\d+)/);
   
-      if (match != null && match.length >= 4) {
-        const fileName = normalize(fileURLToPath(match[1])).replace(process.cwd(), `~`);
-        const line = match[2];
-        const column = match[3];
-  
-        return `${fileName}:${line}:${column}`;
+      if (match != null) {
+        const finalSource = normalize(fileURLToPath(match[0])).replace(process.cwd(), `~`);
+        return finalSource;
       }
     }
   
