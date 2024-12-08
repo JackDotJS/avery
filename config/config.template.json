@@ -3,6 +3,22 @@
     "warningThreshold": 8,
     "shutdownThreshold": 32
   },
+  "permissionGroups": [
+    {
+      "name": "admin",
+      "inherits": "moderator",
+      "roles": []
+    },
+    {
+      "name": "moderator",
+      "inherits": "jrmod",
+      "roles": []
+    },
+    {
+      "name": "jrmod",
+      "roles": []
+    }
+  ],
   "discord": {
     "colors": {
       "default": "#000000",
