@@ -2,7 +2,7 @@ import memory from './memory.js';
 import { ChannelType, ColorResolvable, EmbedBuilder, MessageType } from 'discord.js';
 import { getFunnyString } from '../../util/randomFunnyString.js';
 // eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../../../config/config.json' assert { type: 'json' };
+import cfg from '../../../config/config.json' with { type: 'json' };
 import { permissionCheck } from '../../util/permissions.js';
 
 export function initializeMessageHandler() {

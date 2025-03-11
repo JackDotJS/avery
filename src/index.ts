@@ -9,7 +9,7 @@ import { Logger, IPCLoggerObject } from './util/logger.js';
 
 // typescript eslint doesn't understand yet that import assertions require normal quotes
 // eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../config/config.json' assert { type: 'json' };
+import cfg from '../config/config.json' with { type: 'json' };
 
 interface ModuleInfo {
   process: ChildProcess,

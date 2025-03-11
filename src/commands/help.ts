@@ -9,8 +9,9 @@ import { BaseCommand } from "../classes/Command.js";
 class AboutCommand extends BaseCommand {
   constructor() {
     super({
-      name: `about`,
-      description: `Gives some basic information about Avery.`
+      name: `help`,
+      aliases: [ `commands` ],
+      description: `List or get details about specific commands.`
     });
   }
 

@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../../config/config.json' assert { type: 'json' };
+import cfg from '../../config/config.json' with { type: 'json' };
 
 export interface PermissionGroup {
   name: string,

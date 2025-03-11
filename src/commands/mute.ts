@@ -1,9 +1,9 @@
 import { EmbedBuilder, Message as DiscordMessage, ColorResolvable } from "discord.js";
 import { Message as RevoltMessage } from "revolt.js";
 // eslint-disable-next-line @typescript-eslint/quotes
-import pkg from "../../package.json" assert { type: 'json' };
+import pkg from "../../package.json" with { type: 'json' };
 // eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../../config/config.json' assert { type: 'json' };
+import cfg from '../../config/config.json' with { type: 'json' };
 import { BaseCommand } from "../classes/Command.js";
 
 class MuteCommand extends BaseCommand {

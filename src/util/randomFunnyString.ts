@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/quotes
-import funnyStrings from '../../config/strings.json' assert { type: 'json' }; 
+import funnyStrings from '../../config/strings.json' with { type: 'json' }; 
 
 const memoryLimit = 5;
 
