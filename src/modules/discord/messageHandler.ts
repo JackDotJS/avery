@@ -53,12 +53,10 @@ export function initializeMessageHandler() {
             }
 
             if (cmd.metadata.permissionGroups != null) {
-              const roles: string[] = [];
+              const member = await message.member?.fetch();
+              if (member == null) throw new Error(`Failed to fetch message GuildMember.`);
 
-              message.member?.roles.cache.forEach((roleObj) => {
-                roles.push(roleObj.id);
-              });
-
+              const roles = Array.from(member.roles.cache.keys());
               const allowed = permissionCheck(roles, cmd.metadata.permissionGroups);
 
               if (!allowed) {
