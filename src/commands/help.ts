@@ -6,6 +6,7 @@ import pkg from "../../package.json" with { type: 'json' };
 import cfg from '../../config/config.json' with { type: 'json' };
 import { BaseCommand } from "../classes/Command.js";
 import memory from "../modules/discord/memory.js";
+import { permissionCheck } from "../util/permissions.js";
 
 class HelpCommand extends BaseCommand {
   constructor() {
@@ -89,12 +90,26 @@ class HelpCommand extends BaseCommand {
 
         // add permissions groups field (if applicable)
         if (foundCmd.metadata.permissionGroups) {
+          if (message.member == null) throw new Error(`Message member is null.`);
+          const isAllowed = permissionCheck(
+            Array.from(message.member.roles.cache.keys()), 
+            foundCmd.metadata.permissionGroups
+          );
+
+          const groupsValue = [
+            `\`\`\`${foundCmd.metadata.permissionGroups.join(`, `)}\`\`\``,
+            isAllowed
+              ? `(You can use this command.)`
+              : `(No, you cannot use this command.)`
+          ].join(`\n`);
+
           fields.push({
             name: `Permission Group(s)`,
-            value: foundCmd.metadata.permissionGroups.join(`, `)
+            value: groupsValue
           });
         }
 
+        // done!
         const embed = new EmbedBuilder()
           .setColor(cfg.discord.colors.default as ColorResolvable)
           .setTitle(`?${foundCmd.metadata.name}`)
