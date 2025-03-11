@@ -1,4 +1,4 @@
-import memory from './memory.js';
+import { memory } from './memory.js';
 import { getFunnyString } from '../../util/randomFunnyString.js';
 
 export function initalizePresenceUpdater() {

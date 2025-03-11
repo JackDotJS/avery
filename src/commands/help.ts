@@ -3,7 +3,7 @@ import { EmbedBuilder, Message as DiscordMessage, ColorResolvable } from "discor
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from '../../config/config.json' with { type: 'json' };
 import { type Command, type CommandMetadata } from "../types/Command.js";
-import memory from "../modules/discord/memory.js";
+import { memory as discordMemory } from "../modules/discord/memory.js";
 import { permissionCheck } from "../util/permissions.js";
 
 const metadata: CommandMetadata = {
@@ -24,7 +24,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     const query = args[0].toLowerCase();
     let foundCmd = null;
 
-    exactSearch: for (const cmd of memory.commands) {
+    exactSearch: for (const cmd of discordMemory.commands) {
       if (cmd.metadata.name === query) {
         foundCmd = cmd;
         break;
@@ -119,17 +119,17 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
   } else {
     // show commands list with given page number.
     const pageSize = 10;
-    const maxPages = Math.ceil(memory.commands.length / pageSize);
+    const maxPages = Math.ceil(discordMemory.commands.length / pageSize);
     const targetRounded = Math.max(0, Math.min(targetPage, maxPages-1));
 
     // generate commands list for current page
     const fields = [];
     const loopStart = (targetRounded * pageSize);
     // loop ends once we hit pageSize OR end of commands array
-    const loopEnd = Math.min(loopStart + pageSize, memory.commands.length);
+    const loopEnd = Math.min(loopStart + pageSize, discordMemory.commands.length);
 
     for (let i = loopStart; i < loopEnd; i++) {
-      const cmd = memory.commands[i];
+      const cmd = discordMemory.commands[i];
       fields.push({
         name: `?${cmd.metadata.name}`,
         value: cmd.metadata.description

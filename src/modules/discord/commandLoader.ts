@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { readdirSync, existsSync } from 'fs';
-import memory from './memory.js';
+import { memory } from './memory.js';
 import { type Command } from '../../types/Command.js';
 
 export async function initializeCommands() {

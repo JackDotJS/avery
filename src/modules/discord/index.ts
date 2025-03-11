@@ -3,7 +3,7 @@ import keys from '../../../config/keys.json' with { type: 'json' };
 // eslint-disable-next-line @typescript-eslint/quotes
 import funnyStrings from '../../../config/strings.json' with { type: 'json' };
 import { Client, GatewayIntentBits as Intents, ClientOptions, Partials, ActivityType } from 'discord.js';
-import memory from './memory.js';
+import { memory } from './memory.js';
 import { Logger } from '../../util/logger.js';
 import { initializeCommands } from './commandLoader.js';
 import { initializeMessageHandler } from './messageHandler.js';
