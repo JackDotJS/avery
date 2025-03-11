@@ -12,12 +12,8 @@ export type CommandMetadata = {
 export type CommandDiscordHandler = ((message: DiscordMessage, args: string[]) => Promise<void>) | null;
 export type CommandRevoltHandler = ((message: RevoltMessage, args: string[]) => Promise<void>) | null;
 
-export class BaseCommand {
+export type Command = {
   metadata: CommandMetadata;
-  discordHandler: CommandDiscordHandler = null;
-  revoltHandler: CommandRevoltHandler = null;
-
-  constructor(md: CommandMetadata) {
-    this.metadata = md;
-  }
-}
+  discordHandler?: CommandDiscordHandler;
+  revoltHandler?: CommandRevoltHandler;
+};

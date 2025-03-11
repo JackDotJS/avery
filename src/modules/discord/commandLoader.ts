@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { readdirSync, existsSync } from 'fs';
 import memory from './memory.js';
-import { BaseCommand } from '../../classes/Command.js';
+import { type Command } from '../../types/Command.js';
 
 export async function initializeCommands() {
   if (!memory.log) throw new Error(`memory.log is null!`);
@@ -18,20 +18,9 @@ export async function initializeCommands() {
     if (item.isDirectory()) continue;
 
     const module = await import(`${cmdDir}/${item.name}`);
-    const newCmd = module.default;
+    const newCmd: Command = module.default;
 
-    if ((newCmd instanceof BaseCommand) == false) {
-      log.debug(newCmd instanceof BaseCommand, typeof newCmd, newCmd);
-      log.warn(`Failed to load command "${item.name}" (Not a valid command)`);
-      continue;
-    }
-
-    if (newCmd.metadata == null) {
-      log.debug(newCmd);
-      log.warn(`Failed to load command "${item.name}" (Missing metadata)`);
-      continue;
-    }
-
+    // check for name/alias conflicts
     for (const existingCmd of memory.commands) {
       if (existingCmd.metadata.name == newCmd.metadata.name) {
         log.warn(`Failed to load command "${item.name}" (Name already exists)`);
@@ -58,6 +47,7 @@ export async function initializeCommands() {
       }
     }
 
+    // check if usable in this context
     if (newCmd.discordHandler == null) {
       log.info(`Failed to load command "${item.name}" (Not executable in Discord context)`);
       continue;

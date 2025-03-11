@@ -1,11 +1,11 @@
 import { Logger } from '../../util/logger.js';
 import { Client } from 'discord.js';
-import { BaseCommand } from '../../classes/Command.js';
+import { type Command } from "../../types/Command.js";
 
 interface MemoryInterface {
   log: Logger | null,
   bot: Client | null,
-  commands: BaseCommand[]
+  commands: Command[]
 }
 
 const memory: MemoryInterface = {
