@@ -36,6 +36,8 @@ export function initializeMessageHandler() {
       const inputArgs = message.content.slice(1).trim().split(/ +/g);
       const inputCmd = inputArgs.shift()?.toLowerCase();
 
+      if (inputCmd == null) throw new Error(`inputCmd is undefined (THIS SHOULD *NEVER* HAPPEN)`);
+
       log.info([
         `Command issued by @${message.member?.user.username} (${message.member?.user.id}):`,
         inputCmd,
@@ -44,7 +46,7 @@ export function initializeMessageHandler() {
 
       for (const cmd of memory.commands) {
         // TODO: handle command aliases
-        if (cmd.metadata.name === inputCmd) {
+        if (cmd.metadata.name === inputCmd || cmd.metadata.aliases && cmd.metadata.aliases.includes(inputCmd)) {
           try {
             if (cmd.discordHandler == null) {
               throw new Error(`Command "${cmd.metadata.name}" does not contain a valid handler for this context. This should never happen!!!`);
