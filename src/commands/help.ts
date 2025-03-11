@@ -110,7 +110,7 @@ class HelpCommand extends BaseCommand {
       // show commands list with given page number.
       const pageSize = 10;
       const maxPages = Math.ceil(memory.commands.length / pageSize);
-      const targetRounded = Math.max(0, Math.min(targetPage, maxPages));
+      const targetRounded = Math.max(0, Math.min(targetPage, maxPages-1));
 
       // generate commands list for current page
       const fields = [];
@@ -131,7 +131,7 @@ class HelpCommand extends BaseCommand {
         .setTitle(`List of Commands`)
         .setDescription(`Page ${targetRounded+1}/${maxPages}`)
         .addFields(fields)
-        .setFooter({ text: `To see more commands, use ?help <page #>` });
+        .setFooter({ text: `To see more commands, use ?help [page #]` });
     
       await message.reply({
         embeds: [ embed ]
