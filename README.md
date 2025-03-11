@@ -102,3 +102,4 @@ planned features:
 - in-channel notifications for name/description changes
 - starboard-like pinning feature
 - remindme command
+- `@someone` (because funny)
