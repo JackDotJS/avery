@@ -29,6 +29,9 @@ export function initializeMessageHandler() {
     }
 
     // command handler
+    // TODO: we can probably move a bunch of this logic 
+    // to its own function which can be shared between
+    // the revolt and discord modules
     if (cmdrgx.test(message.content)) {
       const inputArgs = message.content.slice(1).trim().split(/ +/g);
       const inputCmd = inputArgs.shift()?.toLowerCase();

@@ -27,7 +27,8 @@ const djsOpts: ClientOptions = {
       }
     ]
   },
-  allowedMentions: { parse: [`users`, `roles`] }, // remove this line to die instantly
+  // there are literally zero situations where the bot needs to ping @everyone/@here
+  allowedMentions: { parse: [`users`, `roles`] },
   intents: [
     // https://discord.com/developers/docs/topics/gateway#list-of-intents
     Intents.Guilds,
