@@ -75,7 +75,7 @@ export function initializeMessageHandler() {
               }
             }
   
-            await cmd.discordHandler(message);
+            await cmd.discordHandler(message, inputArgs);
             return;
           } catch (error) {
             log.error(error);
