@@ -1,15 +1,16 @@
 import { Message as DiscordMessage } from "discord.js";
 import { Message as RevoltMessage } from "revolt.js";
 
-export interface CommandMetadata {
+export type CommandMetadata = {
   name: string,
   aliases?: string[],
-  permissionGroups?: string[]
-  description: string
-}
+  permissionGroups?: string[],
+  description: string,
+  usage?: string[]
+};
 
-export type CommandDiscordHandler = ((message: DiscordMessage) => Promise<void>) | null;
-export type CommandRevoltHandler = ((message: RevoltMessage) => Promise<void>) | null;
+export type CommandDiscordHandler = ((message: DiscordMessage, args: string[]) => Promise<void>) | null;
+export type CommandRevoltHandler = ((message: RevoltMessage, args: string[]) => Promise<void>) | null;
 
 export class BaseCommand {
   metadata: CommandMetadata;
