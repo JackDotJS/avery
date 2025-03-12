@@ -5,6 +5,7 @@ import cfg from '../../config/config.json' with { type: 'json' };
 import { type Command, type CommandMetadata } from "../types/Command.js";
 import { memory as discordMemory } from "../modules/discord/memory.js";
 import { permissionCheck } from "../util/permissions.js";
+import { jaroWinkler } from "@skyra/jaro-winkler";
 
 const metadata: CommandMetadata = {
   name: `help`,
@@ -23,35 +24,63 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     // argument wasnt a number, so assume we're looking for a command
     const query = args[0].toLowerCase();
     let foundCmd = null;
+    let closestMatchCmd = null;
+    let closestMatchName = ``;
+    let matchConfidence = 0;
+    let foundSimilar = false;
 
     exactSearch: for (const cmd of discordMemory.commands) {
-      if (cmd.metadata.name === query) {
-        foundCmd = cmd;
-        break;
-      }
+      const names = [ cmd.metadata.name ];
+      if (cmd.metadata.aliases) names.push(...cmd.metadata.aliases);
 
-      if (cmd.metadata.aliases) {
-        for (const alias of cmd.metadata.aliases) {
-          if (alias === query) {
-            foundCmd = cmd;
-            break exactSearch;
-          }
+      for (const name of names) {
+        if (name === query) {
+          foundCmd = cmd;
+          break exactSearch;
+        }
+
+        const similarity = jaroWinkler(query, name);
+
+        if (similarity > matchConfidence) {
+          closestMatchCmd = cmd;
+          closestMatchName = name;
+          matchConfidence = similarity;
         }
       }
+    }
+
+    if (!foundCmd && matchConfidence > 0.9) {
+      foundCmd = closestMatchCmd;
+      foundSimilar = true;
     }
 
     if (foundCmd == null) {
       const embed = new EmbedBuilder()
         .setColor(cfg.discord.colors.error as ColorResolvable)
         .setTitle(`?${query}`.substring(0, 256)) // see https://discord.com/developers/docs/resources/message#embed-object-embed-limits
-        .setDescription(`This command does not exist.`)
-        .setFooter({ text: `For more commands, use \`?help\`` });
+        .setFooter({ text: `To list all valid commands, use ?help.` });
+
+      if (matchConfidence > 0.6) {
+        embed.setDescription([
+          `Could not find a command matching this name.`,
+          `-# (Did you mean \`?${closestMatchName}\`?)`
+        ].join(`\n`));
+      } else {
+        embed.setDescription(`This command does not exist.`);
+      }
     
       await message.reply({
         embeds: [ embed ]
       });
     } else {
-      const fields = [];
+      const embed = new EmbedBuilder()
+        .setColor(cfg.discord.colors.default as ColorResolvable)
+        .setTitle(`?${foundCmd.metadata.name}`)
+        .setDescription(foundCmd.metadata.description);
+
+      if (foundSimilar) {
+        embed.setFooter({ text: `Closest match to "${query}" (${parseFloat((matchConfidence * 100).toFixed(2))}% confidence)` });
+      }
 
       // add aliases field (if applicable)
       const aliases = [];
@@ -62,7 +91,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       }
 
       if (aliases.length > 0) {
-        fields.push({
+        embed.addFields({
           name: `Alias(es)`,
           value: aliases.join(`, `)
         });
@@ -76,7 +105,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
         }
       }
 
-      fields.push({
+      embed.addFields({
         name: `Arguments`,
         value: usages.length > 0 
           ? usages.join(`\n`)
@@ -94,24 +123,17 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
         const groupsValue = [
           `\`\`\`${foundCmd.metadata.permissionGroups.join(`, `)}\`\`\``,
           isAllowed
-            ? `(You can use this command.)`
-            : `(No, you cannot use this command.)`
+            ? `-# (You can use this command.)`
+            : `-# (No, you cannot use this command.)`
         ].join(`\n`);
 
-        fields.push({
+        embed.addFields({
           name: `Permission Group(s)`,
           value: groupsValue
         });
       }
 
       // done!
-      const embed = new EmbedBuilder()
-        .setColor(cfg.discord.colors.default as ColorResolvable)
-        .setTitle(`?${foundCmd.metadata.name}`)
-        .setDescription(foundCmd.metadata.description)
-        .addFields(fields)
-        .setFooter({ text: `For more commands, use ?help` });
-    
       await message.reply({
         embeds: [ embed ]
       });
@@ -132,16 +154,15 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       const cmd = discordMemory.commands[i];
       fields.push({
         name: `?${cmd.metadata.name}`,
-        value: cmd.metadata.description
+        value: `-# ` + cmd.metadata.description
       });
     }
 
     const embed = new EmbedBuilder()
       .setColor(cfg.discord.colors.default as ColorResolvable)
       .setTitle(`List of Commands`)
-      .setDescription(`Page ${targetRounded+1}/${maxPages}`)
       .addFields(fields)
-      .setFooter({ text: `To see more commands, use ?help [page #]` });
+      .setFooter({ text: `Page ${targetRounded+1}/${maxPages}  ⦁︎  To see more commands, use ?help [page #]` });
   
     await message.reply({
       embeds: [ embed ]
