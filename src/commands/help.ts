@@ -154,8 +154,8 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       const cmd = discordMemory.commands[i];
   
       descString += [
-        `${i+1}. **${cmd.metadata.name}**`,
-        `  -# ${cmd.metadata.description}`,
+        `${i+1}. **${cmd.metadata.name}**  `,
+        `  -# ${cmd.metadata.description}  `,
         ``
       ].join(`\n`);
     }

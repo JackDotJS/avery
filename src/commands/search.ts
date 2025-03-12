@@ -98,8 +98,8 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     const result = searchData[i];
 
     descString += [
-      `${i+1}. **${result.cmd.metadata.name}**`,
-      `  -# ${result.cmd.metadata.description}`,
+      `${i+1}. **${result.cmd.metadata.name}**  `,
+      `  -# ${result.cmd.metadata.description}  `,
       ``
     ].join(`\n`);
   }
