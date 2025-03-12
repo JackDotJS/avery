@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@skyra/jaro-winkler':
+        specifier: ^1.1.1
+        version: 1.1.1
       bufferutil:
         specifier: ^4.0.8
         version: 4.0.8
@@ -133,6 +136,10 @@ packages:
   '@sapphire/snowflake@3.5.1':
     resolution: {integrity: sha512-BxcYGzgEsdlG0dKAyOm0ehLGm2CafIrfQTZGWgkfKYbj+pNNsorZ7EotuZukc2MT70E0UbppVbtpBrqpzVzjNA==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
+
+  '@skyra/jaro-winkler@1.1.1':
+    resolution: {integrity: sha512-jT2OWwpajtXTb6opnaIwmBTMpQtKUwl2Ro1zApxIIrpZJon71kZIv6GZSc08LzKO2lpTqUjvD+i7Z2hGuG42KQ==}
+    engines: {node: '>=v18'}
 
   '@solid-primitives/map@0.4.13':
     resolution: {integrity: sha512-B1zyFbsiTQvqPr+cuPCXO72sRuczG9Swncqk5P74NCGw1VE8qa/Ry9GlfI1e/VdeQYHjan+XkbE3rO2GW/qKew==}
@@ -886,6 +893,8 @@ snapshots:
       lodash: 4.17.21
 
   '@sapphire/snowflake@3.5.1': {}
+
+  '@skyra/jaro-winkler@1.1.1': {}
 
   '@solid-primitives/map@0.4.13(solid-js@1.9.3)':
     dependencies:
