@@ -145,24 +145,26 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     const targetRounded = Math.max(0, Math.min(targetPage, maxPages-1));
 
     // generate commands list for current page
-    const fields = [];
+    let descString = ``;
     const loopStart = (targetRounded * pageSize);
     // loop ends once we hit pageSize OR end of commands array
     const loopEnd = Math.min(loopStart + pageSize, discordMemory.commands.length);
 
     for (let i = loopStart; i < loopEnd; i++) {
       const cmd = discordMemory.commands[i];
-      fields.push({
-        name: `?${cmd.metadata.name}`,
-        value: `-# ` + cmd.metadata.description
-      });
+  
+      descString += [
+        `${i+1}. **${cmd.metadata.name}**`,
+        `  -# ${cmd.metadata.description}`,
+        ``
+      ].join(`\n`);
     }
 
     const embed = new EmbedBuilder()
       .setColor(cfg.discord.colors.default as ColorResolvable)
       .setTitle(`List of Commands`)
-      .addFields(fields)
-      .setFooter({ text: `Page ${targetRounded+1}/${maxPages}  ⦁︎  To see more commands, use ?help [page #]` });
+      .setDescription(descString)
+      .setFooter({ text: `Page ${targetRounded+1}/${maxPages}  ⦁︎  To see more commands, use ?help [page #].` });
   
     await message.reply({
       embeds: [ embed ]
