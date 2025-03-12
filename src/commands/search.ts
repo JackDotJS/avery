@@ -19,6 +19,17 @@ const metadata: CommandMetadata = {
 };
 
 async function discordHandler(message: DiscordMessage, args: string[]) {
+  if (args.length === 0) {
+    const errorEmbed = new EmbedBuilder()
+      .setColor(cfg.discord.colors.error as ColorResolvable)
+      .setTitle(`You must specify a search query.`)
+      .setFooter({ text: `To list all commands, use ?help.` });
+    
+    return await message.reply({
+      embeds: [ errorEmbed ]
+    });
+  }
+
   const query = args.join(` `);
 
   const searchData: SearchResult[] = [];
