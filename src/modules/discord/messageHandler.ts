@@ -45,7 +45,6 @@ export function initializeMessageHandler() {
       ].join(` `));
 
       for (const cmd of memory.commands) {
-        // TODO: handle command aliases
         if (cmd.metadata.name === inputCmd || cmd.metadata.aliases && cmd.metadata.aliases.includes(inputCmd)) {
           try {
             if (cmd.discordHandler == null) {
