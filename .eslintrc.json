@@ -67,6 +67,7 @@
         "selector": "variableLike", 
         "format": ["camelCase"] 
       }
-    ]
+    ],
+    "no-irregular-whitespace": "warn"
   }
 }
