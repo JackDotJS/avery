@@ -8,7 +8,7 @@ import { type Command, type CommandMetadata } from "../types/Command.js";
 
 const metadata: CommandMetadata = {
   name: `about`,
-  description: `Gives some basic information about Avery.`
+  description: `All there is to know about Avery.`
 };
 
 async function discordHandler(message: DiscordMessage) {
