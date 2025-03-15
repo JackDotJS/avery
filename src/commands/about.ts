@@ -5,6 +5,7 @@ import pkg from "../../package.json" with { type: 'json' };
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from '../../config/config.json' with { type: 'json' };
 import { type Command, type CommandMetadata } from "../types/Command.js";
+import { getIconDiscord } from "../util/getIcon.js";
 
 const metadata: CommandMetadata = {
   name: `about`,
@@ -12,7 +13,13 @@ const metadata: CommandMetadata = {
 };
 
 async function discordHandler(message: DiscordMessage) {
+  const attachment = await getIconDiscord(`info.png`, `default`);
+
   const embed = new EmbedBuilder()
+    .setAuthor({
+      iconURL: `attachment://${attachment.name}`,
+      name: `About`
+    })
     .setColor(cfg.discord.colors.default as ColorResolvable)
     .setTitle(`Avery ${pkg.version}`)
     .setDescription(`The best bot in the entire world.`)
@@ -22,7 +29,8 @@ async function discordHandler(message: DiscordMessage) {
     });
 
   await message.reply({
-    embeds: [ embed ]
+    embeds: [ embed ],
+    files: [ attachment ]
   });
 }
 
