@@ -49,7 +49,7 @@ for (const file of masksFiltered) {
     const buffer = await icon.getBuffer(`image/png`);
     console.debug(`got buffer`);
 
-    // this should result in something like "./icons/discord/default/pencil.png"
+    // this should result in something like "./icons/default/pencil.png"
     const outputDir = `${iconsDir}/${colorData.name}`;
     const outputFilePath = `${outputDir}/${file.name}`;
 
