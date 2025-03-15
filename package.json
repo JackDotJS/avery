@@ -19,6 +19,7 @@
     "chalk": "^5.3.0",
     "dice-coefficient": "^2.1.1",
     "discord.js": "^14.14.1",
+    "jimp": "^1.6.0",
     "lowdb": "^7.0.1",
     "revolt.js": "^7.0.4",
     "utf-8-validate": "^6.0.3"
