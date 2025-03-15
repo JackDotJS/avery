@@ -8,6 +8,7 @@
     "url": "https://github.com/JackDotJS/avery"
   },
   "scripts": {
+    "mkicons": "node ./generate_icons.mjs",
     "cleanup": "rm -rf ./build",
     "build": "tsc --outDir ./build",
     "start": "pnpm cleanup && pnpm build && node build/src/index.js"

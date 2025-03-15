@@ -149,7 +149,11 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/node
 
-# FeatherBot: Private Files
+# Avery: Private Files
 config/keys.json
 config/config.json
 .local/
+
+# Avery: Generated Icons
+icons/*
+!icons/_masks
