@@ -21,7 +21,7 @@ const metadata: CommandMetadata = {
 async function discordHandler(message: DiscordMessage, args: string[]) {
   if (args.length === 0) {
     const errorEmbed = new EmbedBuilder()
-      .setColor(cfg.discord.colors.error as ColorResolvable)
+      .setColor(cfg.colors.error as ColorResolvable)
       .setTitle(`You must specify a search query.`)
       .setFooter({ text: `To list all commands, use ?help.` });
     
@@ -89,7 +89,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
   searchData.splice(10);
 
   const embed = new EmbedBuilder()
-    .setColor(cfg.discord.colors.default as ColorResolvable)
+    .setColor(cfg.colors.default as ColorResolvable)
     .setTitle(`Command Search Results`)
     .setFooter({ text: `To list all commands, use ?help.` });
 

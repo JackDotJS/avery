@@ -13,20 +13,11 @@ console.log(`found ${masksFiltered.length} icon masks`);
 
 // get color names and values from config.json
 const allColors = [];
-
-// these two contexts use essentially the same structure in 
-// the config file so this is just an easy way of quickly
-// iterating over both. this also makes it fairly easy to
-// support additional platforms in the future, if that's
-// ever needed.
-for (const context of [`discord`, `revolt`]) {
-  for (const colorName of Object.keys(cfg[context].colors)) {
-    allColors.push({
-      context: context,
-      name: colorName,
-      color: cfg[context].colors[colorName] 
-    });
-  }
+for (const colorName of Object.keys(cfg.colors)) {
+  allColors.push({
+    name: colorName,
+    color: cfg.colors[colorName] 
+  });
 }
 
 console.log(`found ${allColors.length} colors in config`);
@@ -59,7 +50,7 @@ for (const file of masksFiltered) {
     console.debug(`got buffer`);
 
     // this should result in something like "./icons/discord/default/pencil.png"
-    const outputDir = `${iconsDir}/${colorData.context}/${colorData.name}`;
+    const outputDir = `${iconsDir}/${colorData.name}`;
     const outputFilePath = `${outputDir}/${file.name}`;
 
     console.debug(`making directories "${outputDir}"`);

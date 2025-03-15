@@ -2,15 +2,14 @@ import { AttachmentBuilder } from "discord.js";
 import { readFile } from "fs/promises";
 
 export type IconVibe = `default` | `success` | `warning` | `error`;
-export type IconContext = `discord` | `revolt`;
 
 const iconsDir = `./icons`;
 
 export async function getIconDiscord(filename: string, vibe: IconVibe) {
-  const file = await readFile(`${iconsDir}/discord/${vibe}/${filename}`);
+  const file = await readFile(`${iconsDir}/${vibe}/${filename}`);
   return new AttachmentBuilder(file, { name: `${vibe}_${filename}` });
 }
 
 export async function getIconRevolt(filename: string, vibe: IconVibe) {
-  return await readFile(`${iconsDir}/revolt/${vibe}/${filename}`);
+  return await readFile(`${iconsDir}/${vibe}/${filename}`);
 }

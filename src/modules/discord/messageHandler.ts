@@ -62,7 +62,7 @@ export function initializeMessageHandler() {
                 log.info(`User @${message.member?.user.username} (${message.member?.user.id}) failed to pass permission check`);
 
                 const deniedEmbed = new EmbedBuilder()
-                  .setColor(cfg.discord.colors.error as ColorResolvable)
+                  .setColor(cfg.colors.error as ColorResolvable)
                   .setTitle(`Access Denied`)
                   .setDescription(`You do not have permission to use this command.`);
                 
@@ -84,7 +84,7 @@ export function initializeMessageHandler() {
             }
 
             const errorEmbed = new EmbedBuilder()
-              .setColor(cfg.discord.colors.error as ColorResolvable)
+              .setColor(cfg.colors.error as ColorResolvable)
               .setTitle(`Error during execution`)
               .setDescription([
                 `\`\`\``,
@@ -103,7 +103,7 @@ export function initializeMessageHandler() {
 
       // default response
       const defaultEmbed = new EmbedBuilder()
-        .setColor(cfg.discord.colors.error as ColorResolvable)
+        .setColor(cfg.colors.error as ColorResolvable)
         .setTitle(`Unknown Command`);
 
       message.reply({

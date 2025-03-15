@@ -19,20 +19,10 @@
       "roles": []
     }
   ],
-  "discord": {
-    "colors": {
-      "default": "#000000",
-      "success": "#000000",
-      "warning": "#000000",
-      "error": "#000000"
-    } 
-  },
-  "revolt": {
-    "colors": {
-      "default": "#000000",
-      "success": "#000000",
-      "warning": "#000000",
-      "error": "#000000"
-    }
+  "colors": {
+    "default": "#000000",
+    "success": "#000000",
+    "warning": "#000000",
+    "error": "#000000"
   }
 }

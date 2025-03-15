@@ -56,7 +56,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
 
     if (foundCmd == null) {
       const embed = new EmbedBuilder()
-        .setColor(cfg.discord.colors.error as ColorResolvable)
+        .setColor(cfg.colors.error as ColorResolvable)
         .setTitle(`?${query}`.substring(0, 256)) // see https://discord.com/developers/docs/resources/message#embed-object-embed-limits
         .setFooter({ text: `To list all valid commands, use ?help.` });
 
@@ -74,7 +74,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       });
     } else {
       const embed = new EmbedBuilder()
-        .setColor(cfg.discord.colors.default as ColorResolvable)
+        .setColor(cfg.colors.default as ColorResolvable)
         .setTitle(`?${foundCmd.metadata.name}`)
         .setDescription(foundCmd.metadata.description);
 
@@ -161,7 +161,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     }
 
     const embed = new EmbedBuilder()
-      .setColor(cfg.discord.colors.default as ColorResolvable)
+      .setColor(cfg.colors.default as ColorResolvable)
       .setTitle(`List of Commands`)
       .setDescription(descString)
       .setFooter({ text: `Page ${targetRounded+1}/${maxPages}  ⦁︎  To see more commands, use ?help [page #].` });

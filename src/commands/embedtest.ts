@@ -24,7 +24,7 @@ async function discordHandler(message: DiscordMessage) {
       iconURL: `attachment://${attachment1.name}`,
       name: `embed 1`
     })
-    .setColor(cfg.discord.colors.default as ColorResolvable)
+    .setColor(cfg.colors.default as ColorResolvable)
     .setTitle(`default embed`);
   
   const embed2 = new EmbedBuilder()
@@ -32,7 +32,7 @@ async function discordHandler(message: DiscordMessage) {
       iconURL: `attachment://${attachment2.name}`,
       name: `embed 2`
     })
-    .setColor(cfg.discord.colors.success as ColorResolvable)
+    .setColor(cfg.colors.success as ColorResolvable)
     .setTitle(`success embed`);
 
   const embed3 = new EmbedBuilder()
@@ -40,7 +40,7 @@ async function discordHandler(message: DiscordMessage) {
       iconURL: `attachment://${attachment3.name}`,
       name: `embed 3`
     })
-    .setColor(cfg.discord.colors.warning as ColorResolvable)
+    .setColor(cfg.colors.warning as ColorResolvable)
     .setTitle(`warning embed`);
 
   const embed4 = new EmbedBuilder()
@@ -48,7 +48,7 @@ async function discordHandler(message: DiscordMessage) {
       iconURL: `attachment://${attachment4.name}`,
       name: `embed 4`
     })
-    .setColor(cfg.discord.colors.error as ColorResolvable)
+    .setColor(cfg.colors.error as ColorResolvable)
     .setTitle(`error embed`);
 
   await message.reply({
@@ -59,7 +59,7 @@ async function discordHandler(message: DiscordMessage) {
 
 async function revoltHandler(message: RevoltMessage) {
   const embed = {
-    colour: cfg.revolt.colors.default,
+    colour: cfg.colors.default,
     title: `Avery ${pkg.version}`,
     description: [
       `The best bot in the entire world.`,

@@ -20,7 +20,7 @@ async function discordHandler(message: DiscordMessage) {
       iconURL: `attachment://${attachment.name}`,
       name: `About`
     })
-    .setColor(cfg.discord.colors.default as ColorResolvable)
+    .setColor(cfg.colors.default as ColorResolvable)
     .setTitle(`Avery ${pkg.version}`)
     .setDescription(`The best bot in the entire world.`)
     .addFields({
@@ -36,7 +36,7 @@ async function discordHandler(message: DiscordMessage) {
 
 async function revoltHandler(message: RevoltMessage) {
   const embed = {
-    colour: cfg.revolt.colors.default,
+    colour: cfg.colors.default,
     title: `Avery ${pkg.version}`,
     description: [
       `The best bot in the entire world.`,
