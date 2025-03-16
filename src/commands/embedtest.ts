@@ -25,7 +25,30 @@ async function discordHandler(message: DiscordMessage) {
       name: `embed 1`
     })
     .setColor(cfg.colors.default as ColorResolvable)
-    .setTitle(`default embed`);
+    .setTitle(`default`)
+    .setDescription([
+      `# header 1`,
+      `## header 2`,
+      `### header 3`, 
+      ``,
+      `-# subtext`,
+      ``,
+      `1. numbered list`,
+      `2. numbered list`,
+      `3. numbered list`,
+      ``,
+      `- unordered list`,
+      `- unordered list`,
+      `- unordered list`,
+      ``,
+      `> quote`,
+      ``,
+      `\`\`\`code block\`\`\``,
+      ``,
+      `\`inline code block\``,
+      ``,
+      `|| spoilered text ||`
+    ].join(`\n`));
   
   const embed2 = new EmbedBuilder()
     .setAuthor({
@@ -33,7 +56,7 @@ async function discordHandler(message: DiscordMessage) {
       name: `embed 2`
     })
     .setColor(cfg.colors.success as ColorResolvable)
-    .setTitle(`success embed`);
+    .setTitle(`success`);
 
   const embed3 = new EmbedBuilder()
     .setAuthor({
@@ -41,7 +64,7 @@ async function discordHandler(message: DiscordMessage) {
       name: `embed 3`
     })
     .setColor(cfg.colors.warning as ColorResolvable)
-    .setTitle(`warning embed`);
+    .setTitle(`warning`);
 
   const embed4 = new EmbedBuilder()
     .setAuthor({
@@ -49,7 +72,7 @@ async function discordHandler(message: DiscordMessage) {
       name: `embed 4`
     })
     .setColor(cfg.colors.error as ColorResolvable)
-    .setTitle(`error embed`);
+    .setTitle(`error`);
 
   await message.reply({
     embeds: [ embed1, embed2, embed3, embed4 ],
