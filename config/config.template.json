@@ -24,5 +24,9 @@
     "success": "#000000",
     "warning": "#000000",
     "error": "#000000"
+  },
+  "icons": {
+    "useCdn": false,
+    "cdnUrl": ""
   }
 }
