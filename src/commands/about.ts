@@ -21,7 +21,7 @@ async function discordHandler(message: DiscordMessage) {
       `# Avery v${pkg.version}`,
       `Made with love (endless frustration and sleepless nights) by <@181214529340833792> <3`,
       `### Get Started`,
-      `Type \`?help\` to list commands. To view more details about a specific command, type \`?help [command name]\``,
+      `Type \`?help\` to get a list of commands. To view more details about a specific command, type \`?help [command name]\``,
       `### Source Code on GitHub`,
       `https://github.com/JackDotJS/avery`
     ].join(`\n`))
