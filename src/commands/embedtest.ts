@@ -1,9 +1,4 @@
 import { Message as DiscordMessage } from "discord.js";
-import { Message as RevoltMessage } from "revolt.js";
-// eslint-disable-next-line @typescript-eslint/quotes
-import pkg from "../../package.json" with { type: 'json' };
-// eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../../config/config.json' with { type: 'json' };
 import { type Command, type CommandMetadata } from "../types/Command.js";
 import { UniversalEmbed } from "../util/universalEmbed.js";
 
@@ -76,25 +71,7 @@ async function discordHandler(message: DiscordMessage) {
   });
 }
 
-async function revoltHandler(message: RevoltMessage) {
-  const embed = {
-    colour: cfg.colors.default,
-    title: `Avery ${pkg.version}`,
-    description: [
-      `The best bot in the entire world.`,
-      ``,
-      `Source Code on GitHub:`,
-      `https://github.com/JackDotJS/avery`
-    ].join()
-  };
-
-  await message.reply({
-    embeds: [ embed ]
-  });
-}
-
 export default {
   metadata,
-  discordHandler,
-  revoltHandler
+  discordHandler
 } as Command;

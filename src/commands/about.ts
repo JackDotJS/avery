@@ -1,4 +1,4 @@
-import { EmbedBuilder, Message as DiscordMessage, ColorResolvable } from "discord.js";
+import { Message as DiscordMessage } from "discord.js";
 import { Message as RevoltMessage } from "revolt.js";
 // eslint-disable-next-line @typescript-eslint/quotes
 import pkg from "../../package.json" with { type: 'json' };

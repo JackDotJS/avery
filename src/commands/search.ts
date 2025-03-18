@@ -1,10 +1,9 @@
-import { EmbedBuilder, Message as DiscordMessage, ColorResolvable } from "discord.js";
+import { Message as DiscordMessage } from "discord.js";
 // import { Message as RevoltMessage } from "revolt.js";
-// eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../../config/config.json' with { type: 'json' };
 import { type Command, type CommandMetadata } from "../types/Command.js";
 import { memory as discordMemory } from "../modules/discord/memory.js";
 import { diceCoefficient } from "dice-coefficient";
+import { UniversalEmbed } from "../util/universalEmbed.js";
 
 type SearchResult = {
   cmd: Command,
@@ -20,14 +19,15 @@ const metadata: CommandMetadata = {
 
 async function discordHandler(message: DiscordMessage, args: string[]) {
   if (args.length === 0) {
-    const errorEmbed = new EmbedBuilder()
-      .setColor(cfg.colors.error as ColorResolvable)
-      .setTitle(`You must specify a search query.`)
-      .setFooter({ text: `To list all commands, use ?help.` });
-    
-    return await message.reply({
-      embeds: [ errorEmbed ]
-    });
+    return await new UniversalEmbed(message)
+      .setVibe(`error`)
+      .setIcon(`error.png`)
+      .setTitle(`Error`)
+      .setDescription([
+        `You must specify a search query.`,
+        `-# To list all commands, use \`?help\`.`
+      ].join(`\n`))
+      .submitReply();
   }
 
   const query = args.join(` `);
@@ -85,30 +85,27 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     });
   }
 
+  // sort highest to lowest similarity
   searchData.sort((a, b) => b.highestVal - a.highestVal);
+  // reduce to 10 items
   searchData.splice(10);
 
-  const embed = new EmbedBuilder()
-    .setColor(cfg.colors.default as ColorResolvable)
-    .setTitle(`Command Search Results`)
-    .setFooter({ text: `To list all commands, use ?help.` });
-
-  let descString = ``;
+  let descBody = ``;
   for (let i = 0; i < searchData.length; i++) {
     const result = searchData[i];
 
-    descString += [
-      `${i+1}. **${result.cmd.metadata.name}**  `,
-      `  -# ${result.cmd.metadata.description}  `,
+    descBody += [
+      `### ${result.cmd.metadata.name}  `,
+      `-# ${result.cmd.metadata.description}`,
       ``
     ].join(`\n`);
   }
 
-  embed.setDescription(descString);
-
-  await message.reply({
-    embeds: [ embed ]
-  });
+  await new UniversalEmbed(message)
+    .setIcon(`document.png`)
+    .setTitle(`Search Results`)
+    .setDescription(descBody)
+    .submitReply();
 }
 
 export default {

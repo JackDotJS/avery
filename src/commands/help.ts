@@ -1,11 +1,10 @@
-import { EmbedBuilder, Message as DiscordMessage, ColorResolvable } from "discord.js";
+import { Message as DiscordMessage } from "discord.js";
 // import { Message as RevoltMessage } from "revolt.js";
-// eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../../config/config.json' with { type: 'json' };
 import { type Command, type CommandMetadata } from "../types/Command.js";
 import { memory as discordMemory } from "../modules/discord/memory.js";
 import { permissionCheck } from "../util/permissions.js";
 import { jaroWinkler } from "@skyra/jaro-winkler";
+import { UniversalEmbed } from "../util/universalEmbed.js";
 
 const metadata: CommandMetadata = {
   name: `help`,
@@ -55,34 +54,36 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     }
 
     if (foundCmd == null) {
-      const embed = new EmbedBuilder()
-        .setColor(cfg.colors.error as ColorResolvable)
-        .setTitle(`?${query}`.substring(0, 256)) // see https://discord.com/developers/docs/resources/message#embed-object-embed-limits
-        .setFooter({ text: `To list all valid commands, use ?help.` });
+      let cmdTruncated = query.substring(0, 64);
+      if (cmdTruncated.length < query.length) {
+        cmdTruncated += `...`;
+      }
+
+      let descBody = `Couldn't find any information on command \`?${cmdTruncated}\`.`;
 
       if (matchConfidence > 0.6) {
-        embed.setDescription([
-          `Could not find a command matching this name.`,
-          `-# (Did you mean \`?${closestMatchName}\`?)`
-        ].join(`\n`));
-      } else {
-        embed.setDescription(`This command does not exist.`);
+        descBody += ` (Did you mean \`?${closestMatchName}\`?)`;
       }
-    
-      await message.reply({
-        embeds: [ embed ]
-      });
+
+      await new UniversalEmbed(message)
+        .setVibe(`error`)
+        .setIcon(`error.png`)
+        .setTitle(`Avery Commands`)
+        .setDescription([
+          descBody,
+          `-# To list all valid commands, use \`?help\`.`
+        ].join(`\n`))
+        .submitReply();
     } else {
-      const embed = new EmbedBuilder()
-        .setColor(cfg.colors.default as ColorResolvable)
-        .setTitle(`?${foundCmd.metadata.name}`)
-        .setDescription(foundCmd.metadata.description);
+      const descBody = [ `# ?${foundCmd.metadata.name}` ];
 
       if (foundSimilar) {
-        embed.setFooter({ text: `Closest match to "${query}" (${parseFloat((matchConfidence * 100).toFixed(2))}% confidence)` });
+        descBody.push(`-# Closest match to "${query}" (${parseFloat((matchConfidence * 100).toFixed(2))}% confidence)`);
       }
 
-      // add aliases field (if applicable)
+      descBody.push(foundCmd.metadata.description);
+
+      // add aliases
       const aliases = [];
       if (foundCmd.metadata.aliases) {
         for (const alias of foundCmd.metadata.aliases) {
@@ -91,13 +92,13 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       }
 
       if (aliases.length > 0) {
-        embed.addFields({
-          name: `Alias(es)`,
-          value: aliases.join(`, `)
-        });
+        descBody.push(
+          `### Alias(es)`,
+          aliases.join(`, `)
+        );
       }
 
-      // add arguments/usage field
+      // add arguments/usage
       const usages = [];
       if (foundCmd.metadata.usage) {
         for (const usageExample of foundCmd.metadata.usage) {
@@ -105,38 +106,44 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
         }
       }
 
-      embed.addFields({
-        name: `Arguments`,
-        value: usages.length > 0 
-          ? usages.join(`\n`)
-          : `None.`
-      });
+      descBody.push(
+        `### Arguments`,
+        usages.length > 0 ? usages.join(`\n`) : `None.`
+      );
 
-      // add permissions groups field (if applicable)
+      // add permissions groups
       if (foundCmd.metadata.permissionGroups) {
         if (message.member == null) throw new Error(`Message member is null.`);
+
+        const groupsValue = [];
+
+        for (const group of foundCmd.metadata.permissionGroups) {
+          groupsValue.push(`\`${group}\``);
+        }
+
+        descBody.push(
+          `### Permission Group(s)`,
+          groupsValue.join(`, `)
+        );
+
         const isAllowed = permissionCheck(
           Array.from(message.member.roles.cache.keys()), 
           foundCmd.metadata.permissionGroups
         );
 
-        const groupsValue = [
-          `\`\`\`${foundCmd.metadata.permissionGroups.join(`, `)}\`\`\``,
-          isAllowed
-            ? `-# (You can use this command.)`
-            : `-# (No, you cannot use this command.)`
-        ].join(`\n`);
-
-        embed.addFields({
-          name: `Permission Group(s)`,
-          value: groupsValue
-        });
+        if (isAllowed) {
+          descBody.push(`-# (You can use this command.)`);
+        } else {
+          descBody.push(`-# (No, you cannot use this command.)`);
+        }
       }
 
       // done!
-      await message.reply({
-        embeds: [ embed ]
-      });
+      await new UniversalEmbed(message)
+        .setIcon(`document.png`)
+        .setTitle(`Avery Commands`)
+        .setDescription(descBody.join(`\n`))
+        .submitReply();
     }
   } else {
     // show commands list with given page number.
@@ -145,7 +152,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     const targetRounded = Math.max(0, Math.min(targetPage, maxPages-1));
 
     // generate commands list for current page
-    let descString = ``;
+    let descBody = ``;
     const loopStart = (targetRounded * pageSize);
     // loop ends once we hit pageSize OR end of commands array
     const loopEnd = Math.min(loopStart + pageSize, discordMemory.commands.length);
@@ -153,22 +160,21 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     for (let i = loopStart; i < loopEnd; i++) {
       const cmd = discordMemory.commands[i];
   
-      descString += [
-        `${i+1}. **${cmd.metadata.name}**  `,
-        `  -# ${cmd.metadata.description}  `,
+      descBody += [
+        `### ${cmd.metadata.name}  `,
+        `-# ${cmd.metadata.description}`,
         ``
       ].join(`\n`);
     }
 
-    const embed = new EmbedBuilder()
-      .setColor(cfg.colors.default as ColorResolvable)
-      .setTitle(`List of Commands`)
-      .setDescription(descString)
-      .setFooter({ text: `Page ${targetRounded+1}/${maxPages}  ⦁︎  To see more commands, use ?help [page #].` });
-  
-    await message.reply({
-      embeds: [ embed ]
-    });
+    await new UniversalEmbed(message)
+      .setIcon(`document.png`)
+      .setTitle(`Avery Commands`)
+      .setDescription([
+        descBody,
+        `-# Page ${targetRounded+1}/${maxPages}  ⦁︎  To see more commands, use \`?help [page #]\`.`
+      ].join(`\n`))
+      .submitReply();
   }
 }
 
