@@ -1,9 +1,9 @@
 import { memory } from './memory.js';
-import { ChannelType, ColorResolvable, EmbedBuilder, MessageType } from 'discord.js';
+import { ChannelType, MessageType } from 'discord.js';
 import { getFunnyString } from '../../util/randomFunnyString.js';
-// eslint-disable-next-line @typescript-eslint/quotes
-import cfg from '../../../config/config.json' with { type: 'json' };
 import { permissionCheck } from '../../util/permissions.js';
+import { UniversalEmbed } from '../../util/universalEmbed.js';
+import { jaroWinkler } from '@skyra/jaro-winkler';
 
 export function initializeMessageHandler() {
   if (!memory.log) throw new Error(`memory.log is null!`);
@@ -35,6 +35,8 @@ export function initializeMessageHandler() {
     if (cmdrgx.test(message.content)) {
       const inputArgs = message.content.slice(1).trim().split(/ +/g);
       const inputCmd = inputArgs.shift()?.toLowerCase();
+      let closestMatchName = ``;
+      let matchConfidence = 0;
 
       if (inputCmd == null) throw new Error(`inputCmd is undefined (THIS SHOULD *NEVER* HAPPEN)`);
 
@@ -45,32 +47,32 @@ export function initializeMessageHandler() {
       ].join(` `));
 
       for (const cmd of memory.commands) {
+        // found match
         if (cmd.metadata.name === inputCmd || cmd.metadata.aliases && cmd.metadata.aliases.includes(inputCmd)) {
           try {
             if (cmd.discordHandler == null) {
               throw new Error(`Command "${cmd.metadata.name}" does not contain a valid handler for this context. This should never happen!!!`);
             }
 
-            if (cmd.metadata.permissionGroups != null) {
-              const member = await message.member?.fetch();
-              if (member == null) throw new Error(`Failed to fetch message GuildMember.`);
+            const member = await message.member?.fetch();
+            if (member == null) throw new Error(`Failed to fetch message GuildMember.`);
 
+            if (cmd.metadata.permissionGroups != null) {
               const roles = Array.from(member.roles.cache.keys());
               const allowed = permissionCheck(roles, cmd.metadata.permissionGroups);
 
               if (!allowed) {
                 log.info(`User @${message.member?.user.username} (${message.member?.user.id}) failed to pass permission check`);
 
-                const deniedEmbed = new EmbedBuilder()
-                  .setColor(cfg.colors.error as ColorResolvable)
-                  .setTitle(`Access Denied`)
-                  .setDescription(`You do not have permission to use this command.`);
-                
-                message.reply({
-                  embeds: [ deniedEmbed ]
-                });
-
-                return;
+                return await new UniversalEmbed(message)
+                  .setVibe(`error`)
+                  .setIcon(`error.png`)
+                  .setTitle(`Error`)
+                  .setDescription([
+                    `## Access Denied`,
+                    `You do not have permission to run this command.`
+                  ].join(`\n`))
+                  .submitReply();
               }
             }
   
@@ -83,34 +85,48 @@ export function initializeMessageHandler() {
               return log.error(`error is not an error? wtf`);
             }
 
-            const errorEmbed = new EmbedBuilder()
-              .setColor(cfg.colors.error as ColorResolvable)
-              .setTitle(`Error during execution`)
+            return await new UniversalEmbed(message)
+              .setVibe(`error`)
+              .setIcon(`error.png`)
+              .setTitle(`Error`)
               .setDescription([
-                `\`\`\``,
-                error.toString(),
-                `\`\`\``,
-              ].join(`\n`));
-            
-            message.reply({
-              embeds: [ errorEmbed ]
-            });
-            
-            return;
+                `## Something went wrong:`,
+                `\`\`\`${error}\`\`\``
+              ].join(`\n`))
+              .submitReply();
+          }
+        }
+
+        // no match
+        const names = [ cmd.metadata.name ];
+        if (cmd.metadata.aliases) names.push(...cmd.metadata.aliases);
+
+        for (const name of names) {
+          const similarity = jaroWinkler(inputCmd, name);
+  
+          if (similarity > matchConfidence) {
+            closestMatchName = name;
+            matchConfidence = similarity;
           }
         }
       }
 
       // default response
-      const defaultEmbed = new EmbedBuilder()
-        .setColor(cfg.colors.error as ColorResolvable)
-        .setTitle(`Unknown Command`);
 
-      message.reply({
-        embeds: [ defaultEmbed ]
-      });
+      const descBody = [ `## Unknown Command` ];
 
-      return;
+      if (matchConfidence > 0.75) {
+        descBody.push(`Did you mean \`?${closestMatchName}\`?\n`);
+      }
+
+      descBody.push(`-# To list all valid commands, use \`?help\`.`);
+
+      return await new UniversalEmbed(message)
+        .setVibe(`error`)
+        .setIcon(`error.png`)
+        .setTitle(`Error`)
+        .setDescription(descBody.join(`\n`))
+        .submitReply();
     }
 
     // standard message handler
