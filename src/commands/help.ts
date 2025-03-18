@@ -69,7 +69,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
 
       await new UniversalEmbed(message)
         .setVibe(`error`)
-        .setIcon(`document.png`)
+        .setIcon(`command.png`)
         .setTitle(`Avery Commands`)
         .setDescription([
           descBody.join(`\n`),
@@ -146,7 +146,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
 
       // done!
       await new UniversalEmbed(message)
-        .setIcon(`document.png`)
+        .setIcon(`command.png`)
         .setTitle(`Avery Commands`)
         .setDescription(descBody.join(`\n`))
         .submitReply();
@@ -174,7 +174,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     }
 
     await new UniversalEmbed(message)
-      .setIcon(`document.png`)
+      .setIcon(`command.png`)
       .setTitle(`Avery Commands`)
       .setDescription([
         descBody,

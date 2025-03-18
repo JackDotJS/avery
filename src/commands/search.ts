@@ -113,7 +113,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
     }
   }
 
-  await embed.setIcon(`document.png`)
+  await embed.setIcon(`search.png`)
     .setTitle(`Search Results`)
     .setDescription(descBody)
     .submitReply();
