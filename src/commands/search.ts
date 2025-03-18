@@ -79,30 +79,41 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       highestVal = testPermissions;
     }
 
+    if (highestVal === 0) {
+      // literally no similarity, dont even bother
+      continue;
+    }
+
     searchData.push({
       cmd,
       highestVal
     });
   }
 
-  // sort highest to lowest similarity
-  searchData.sort((a, b) => b.highestVal - a.highestVal);
-  // reduce to 10 items
-  searchData.splice(10);
-
   let descBody = ``;
-  for (let i = 0; i < searchData.length; i++) {
-    const result = searchData[i];
+  const embed = new UniversalEmbed(message);
 
-    descBody += [
-      `### ${result.cmd.metadata.name}  `,
-      `-# ${result.cmd.metadata.description}`,
-      ``
-    ].join(`\n`);
+  if (searchData.length === 0) {
+    descBody = `### No results found!`;
+    embed.setVibe(`error`);
+  } else {
+    // sort highest to lowest similarity
+    searchData.sort((a, b) => b.highestVal - a.highestVal);
+    // reduce to 10 items
+    searchData.splice(10);
+
+    for (let i = 0; i < searchData.length; i++) {
+      const result = searchData[i];
+
+      descBody += [
+        `### ${result.cmd.metadata.name}  `,
+        `-# ${result.cmd.metadata.description}`,
+        ``
+      ].join(`\n`);
+    }
   }
 
-  await new UniversalEmbed(message)
-    .setIcon(`document.png`)
+  await embed.setIcon(`document.png`)
     .setTitle(`Search Results`)
     .setDescription(descBody)
     .submitReply();

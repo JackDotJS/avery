@@ -59,29 +59,35 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
         cmdTruncated += `...`;
       }
 
-      let descBody = `Couldn't find any information on command \`?${cmdTruncated}\`.`;
+      let descBody = [
+        `### Couldn't find any information on command \`?${cmdTruncated}\`.`
+      ];
 
-      if (matchConfidence > 0.6) {
-        descBody += ` (Did you mean \`?${closestMatchName}\`?)`;
+      if (matchConfidence > 0.75) {
+        descBody.push(`(Did you mean \`?${closestMatchName}\`?)`);
       }
 
       await new UniversalEmbed(message)
         .setVibe(`error`)
-        .setIcon(`error.png`)
+        .setIcon(`document.png`)
         .setTitle(`Avery Commands`)
         .setDescription([
-          descBody,
+          descBody.join(`\n`),
+          ``,
           `-# To list all valid commands, use \`?help\`.`
         ].join(`\n`))
         .submitReply();
     } else {
-      const descBody = [ `# ?${foundCmd.metadata.name}` ];
+      const descBody = [];
 
       if (foundSimilar) {
-        descBody.push(`-# Closest match to "${query}" (${parseFloat((matchConfidence * 100).toFixed(2))}% confidence)`);
+        descBody.push(`-# Closest match to "${query}" (${Math.round(matchConfidence * 100)}% confidence)`);
       }
 
-      descBody.push(foundCmd.metadata.description);
+      descBody.push(
+        `# ?${foundCmd.metadata.name}`,
+        foundCmd.metadata.description
+      );
 
       // add aliases
       const aliases = [];
