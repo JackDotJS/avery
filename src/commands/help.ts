@@ -59,7 +59,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
         cmdTruncated += `...`;
       }
 
-      let descBody = [
+      const descBody = [
         `### Couldn't find any information on command \`?${cmdTruncated}\`.`
       ];
 
