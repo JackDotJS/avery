@@ -24,7 +24,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       .setIcon(`error.png`)
       .setTitle(`Error`)
       .setDescription([
-        `You must specify a search query.`,
+        `## You must specify a search query.`,
         `-# To list all commands, use \`?help\`.`
       ].join(`\n`))
       .submitReply();
@@ -94,7 +94,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
   const embed = new UniversalEmbed(message);
 
   if (searchData.length === 0) {
-    descBody = `### No results found!`;
+    descBody = `## No results found!`;
     embed.setVibe(`error`);
   } else {
     // sort highest to lowest similarity

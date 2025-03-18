@@ -60,7 +60,7 @@ async function discordHandler(message: DiscordMessage, args: string[]) {
       }
 
       const descBody = [
-        `### Couldn't find any information on command \`?${cmdTruncated}\`.`
+        `## Couldn't find any information on command \`?${cmdTruncated}\`.`
       ];
 
       if (matchConfidence > 0.75) {
