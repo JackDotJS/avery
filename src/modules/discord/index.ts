@@ -8,6 +8,7 @@ import { Logger } from '../../util/logger.js';
 import { initializeCommands } from './commandLoader.js';
 import { initializeMessageHandler } from './messageHandler.js';
 import { initalizePresenceUpdater } from './presenceUpdater.js';
+import { initializeChannelUpdateHandler } from './channelUpdateHandler.js';
 
 memory.log = new Logger();
 const log = memory.log;
@@ -58,6 +59,7 @@ bot.on(`ready`, (client) => {
     
     initalizePresenceUpdater();
     initializeMessageHandler();
+    initializeChannelUpdateHandler();
   }
 });
 
