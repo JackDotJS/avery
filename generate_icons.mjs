@@ -1,4 +1,5 @@
 import { Jimp } from "jimp";
+import { GifUtil, GifFrame, GifCodec, Gif, BitmapImage } from "gifwrap";
 import { readdir, writeFile, mkdir } from "node:fs/promises";
 // eslint-disable-next-line @typescript-eslint/quotes
 import cfg from "./config/config.json"  with { type: 'json' };
@@ -28,39 +29,100 @@ console.log(`total items to generate: ${masksFiltered.length * allColors.length}
 let written = 0;
 
 for (const file of masksFiltered) {
-  const mask = await Jimp.read(`${iconMasksDir}/${file.name}`);
-  console.debug(`successfully read file: ${file.name}`);
+  const images = [];
 
-  for (const colorData of allColors) {
-    // create new image with the resolution of the current mask 
-    // and a solid background using the current color
-    const icon = new Jimp({
-      width: mask.bitmap.width, 
-      height: mask.bitmap.height, 
-      color: colorData.color
-    });
-    console.debug(`blank icon created`);
+  if (file.name.toLowerCase().endsWith(`.png`)) {
+    const mask = await Jimp.read(`${iconMasksDir}/${file.name}`);
+    console.debug(`successfully read file: ${file.name}`);
 
-    // apply icon mask
-    icon.mask(mask, 0, 0);
-    console.debug(`icon mask applied`);
+    for (const colorData of allColors) {
+      // create new image with the resolution of the current mask 
+      // and a solid background using the current color
+      const icon = new Jimp({
+        width: mask.bitmap.width, 
+        height: mask.bitmap.height, 
+        color: colorData.color
+      });
+      console.debug(`blank icon created`);
+  
+      // apply icon mask
+      icon.mask(mask, 0, 0);
+      console.debug(`icon mask applied`);
+  
+      // get buffer that we can write to disk
+      const buffer = await icon.getBuffer(`image/png`);
+      console.debug(`got buffer`);
 
-    // get buffer that we can write to disk
-    const buffer = await icon.getBuffer(`image/png`);
-    console.debug(`got buffer`);
+      // this should result in something like "./icons/default/pencil.png"
+      const outputDir = `${iconsDir}/${colorData.name}`;
+      const outputFilePath = `${outputDir}/${file.name}`;
+      
+      // done!
+      images.push({
+        buffer,
+        outputDir,
+        outputFilePath
+      });
+    }
+  }
 
-    // this should result in something like "./icons/default/pencil.png"
-    const outputDir = `${iconsDir}/${colorData.name}`;
-    const outputFilePath = `${outputDir}/${file.name}`;
+  if (file.name.toLowerCase().endsWith(`.gif`)) {
+    const mask = await GifUtil.read(`${iconMasksDir}/${file.name}`);
+    console.debug(`successfully read file: ${file.name}`);
 
-    console.debug(`making directories "${outputDir}"`);
-    await mkdir(outputDir, { recursive: true });
+    for (const colorData of allColors) {
+      const frames = [];
 
-    console.log(`writing "${outputFilePath}"...`);
+      for (const i in mask.frames) {
+        // create new image with the resolution of the current mask 
+        // and a solid background using the current color
+        const currentFrame = new Jimp({
+          width: mask.frames[i].bitmap.width, 
+          height: mask.frames[i].bitmap.height, 
+          color: colorData.color
+        });
 
-    // done!
-    await writeFile(outputFilePath, buffer);
-    console.debug(`successfully wrote icon: ${outputFilePath}`);
+        // console.debug(mask.frames[i]);
+
+        // get and apply icon mask
+        const currentFrameMask = new Jimp(mask.frames[i].bitmap);
+        currentFrame.mask(currentFrameMask, 0, 0);
+
+        // convert Jimp object to GifFrame
+        const currentFrameAsGifFrame = new GifFrame(new BitmapImage(mask.frames[i]));
+        currentFrameAsGifFrame.delayCentisecs = mask.frames[i].delayCentisecs;
+        currentFrameAsGifFrame.bitmap = currentFrame.bitmap;
+
+        // push to frames array
+        frames.push(currentFrameAsGifFrame);
+      }
+
+      const codec = new GifCodec();
+
+      // encode gif and get buffer
+      const buffer = (await codec.encodeGif(frames, { loops: 0, colorScope: Gif.LocalColorsOnly })).buffer;
+      const outputDir = `${iconsDir}/${colorData.name}`;
+      const outputFilePath = `${outputDir}/${file.name}`;
+
+      // done!
+      images.push({
+        buffer,
+        outputDir,
+        outputFilePath
+      });
+    }
+  }
+
+  for (const image of images) {
+    // ensure directories exist
+    console.debug(`making directories "${image.outputDir}"`);
+    await mkdir(image.outputDir, { recursive: true });
+
+    console.log(`writing "${image.outputFilePath}"...`);
+
+    // write file
+    await writeFile(image.outputFilePath, image.buffer);
+    console.debug(`successfully wrote icon: ${image.outputFilePath}`);
     written++;
   }
 }
