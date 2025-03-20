@@ -84,14 +84,28 @@ for (const file of masksFiltered) {
 
         // console.debug(mask.frames[i]);
 
-        // get and apply icon mask
+        // get icon mask as Jimp object
         const currentFrameMask = new Jimp(mask.frames[i].bitmap);
+
+        // remove all* grey colors from the mask
+        // because gifs dont support partial transparency
+        currentFrameMask.scan((x, y) => {
+          const hex = currentFrameMask.getPixelColor(x, y);
+          // *i'd make this filter everything below 0xffffffff, but
+          // that makes the result flicker like crazy for some reason.
+          //
+          // it still gets most of the greyscale colors, so whatever
+          if (hex < 0xfafafaff) currentFrameMask.setPixelColor(0x000000ff, x, y);
+        });
+
         currentFrame.mask(currentFrameMask, 0, 0);
 
         // convert Jimp object to GifFrame
-        const currentFrameAsGifFrame = new GifFrame(new BitmapImage(mask.frames[i]));
+        // 
+        // BitmapImage is important here because otherwise
+        // previous frames are not discarded properly
+        const currentFrameAsGifFrame = new GifFrame(new BitmapImage(currentFrame.bitmap));
         currentFrameAsGifFrame.delayCentisecs = mask.frames[i].delayCentisecs;
-        currentFrameAsGifFrame.bitmap = currentFrame.bitmap;
 
         // push to frames array
         frames.push(currentFrameAsGifFrame);

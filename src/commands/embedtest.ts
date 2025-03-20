@@ -10,7 +10,7 @@ const metadata: CommandMetadata = {
 
 async function discordHandler(message: DiscordMessage) {
   const embed1 = await new UniversalEmbed(message)
-    .setIcon(`info.png`)
+    .setIcon(`loading.gif`)
     .setTitle(`embed 1`)
     .setDescription([
       `# header 1`,
@@ -39,19 +39,19 @@ async function discordHandler(message: DiscordMessage) {
 
   const embed2 = await new UniversalEmbed(message)
     .setVibe(`success`)
-    .setIcon(`checkmark.png`)
+    .setIcon(`loading.gif`)
     .setTitle(`embed 2`)
     .generateObjects();
 
   const embed3 = await new UniversalEmbed(message)
     .setVibe(`warning`)
-    .setIcon(`warning.png`)
+    .setIcon(`loading.gif`)
     .setTitle(`embed 3`)
     .generateObjects();
 
   const embed4 = await new UniversalEmbed(message)
     .setVibe(`error`)
-    .setIcon(`error.png`)
+    .setIcon(`loading.gif`)
     .setTitle(`embed 4`)
     .generateObjects();
 
