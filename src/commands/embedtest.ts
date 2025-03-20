@@ -9,49 +9,51 @@ const metadata: CommandMetadata = {
 };
 
 async function discordHandler(message: DiscordMessage) {
+  const icon = `cards.png`;
+
   const embed1 = await new UniversalEmbed(message)
-    .setIcon(`loading.gif`)
+    .setIcon(icon)
     .setTitle(`embed 1`)
-    .setDescription([
-      `# header 1`,
-      `## header 2`,
-      `### header 3`, 
-      ``,
-      `-# subtext`,
-      ``,
-      `1. numbered list`,
-      `2. numbered list`,
-      `3. numbered list`,
-      ``,
-      `- unordered list`,
-      `- unordered list`,
-      `- unordered list`,
-      ``,
-      `> quote`,
-      ``,
-      `\`\`\`code block\`\`\``,
-      ``,
-      `\`inline code block\``,
-      ``,
-      `|| spoilered text ||`
-    ].join(`\n`))
+    // .setDescription([
+    //   `# header 1`,
+    //   `## header 2`,
+    //   `### header 3`, 
+    //   ``,
+    //   `-# subtext`,
+    //   ``,
+    //   `1. numbered list`,
+    //   `2. numbered list`,
+    //   `3. numbered list`,
+    //   ``,
+    //   `- unordered list`,
+    //   `- unordered list`,
+    //   `- unordered list`,
+    //   ``,
+    //   `> quote`,
+    //   ``,
+    //   `\`\`\`code block\`\`\``,
+    //   ``,
+    //   `\`inline code block\``,
+    //   ``,
+    //   `|| spoilered text ||`
+    // ].join(`\n`))
     .generateObjects();
 
   const embed2 = await new UniversalEmbed(message)
     .setVibe(`success`)
-    .setIcon(`loading.gif`)
+    .setIcon(icon)
     .setTitle(`embed 2`)
     .generateObjects();
 
   const embed3 = await new UniversalEmbed(message)
     .setVibe(`warning`)
-    .setIcon(`loading.gif`)
+    .setIcon(icon)
     .setTitle(`embed 3`)
     .generateObjects();
 
   const embed4 = await new UniversalEmbed(message)
     .setVibe(`error`)
-    .setIcon(`loading.gif`)
+    .setIcon(icon)
     .setTitle(`embed 4`)
     .generateObjects();
 
